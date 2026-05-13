@@ -1,0 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    cursor: none;
+  }
+  body {
+    @apply font-jakarta bg-off-white text-ink overflow-x-hidden;
+  }
+  @media (min-width: 768px) {
+    body {
+      cursor: none;
+    }
+    a, button, input, select, textarea {
+      cursor: none;
+    }
+  }
+}
+
+@layer components {
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .glass {
+    @apply backdrop-blur-md bg-white/80 border border-white/20;
+  }
+  .btn-primary {
+    @apply bg-violet text-yellow font-bold py-3 px-6 rounded-full border-2 border-ink shadow-[4px_4px_0_#120D1E] transition-all duration-200 hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_#120D1E] inline-flex items-center gap-2;
+  }
+  .btn-secondary {
+    @apply bg-white text-ink font-semibold py-3 px-6 rounded-full border-2 border-ink shadow-[4px_4px_0_#120D1E] transition-all duration-200 hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_#6C2BD9] hover:border-violet hover:text-violet inline-flex items-center gap-2;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F0EEF8;
+}
+::-webkit-scrollbar-thumb {
+  background: #6C2BD9;
+  border-radius: 4px;
+}
