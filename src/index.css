@@ -7,17 +7,22 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    /* Hide native cursor on all devices that support hover (i.e. mouse users) */
     cursor: none;
   }
   body {
     @apply font-jakarta bg-off-white text-ink overflow-x-hidden;
+    cursor: none;
   }
-  @media (min-width: 768px) {
-    body {
-      cursor: none;
-    }
-    a, button, input, select, textarea {
-      cursor: none;
+  /* Make EVERY element inherit none so the native cursor never flashes back */
+  *, *::before, *::after {
+    cursor: none !important;
+  }
+  /* On true touch devices there is no mouse cursor — restore auto so tapping
+     feels normal on phones/tablets */
+  @media (hover: none) and (pointer: coarse) {
+    html, body, *, *::before, *::after {
+      cursor: auto !important;
     }
   }
 }

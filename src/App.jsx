@@ -10,19 +10,18 @@ import About from './components/sections/About'
 import LeadCapture from './components/sections/LeadCapture'
 import Cta from './components/sections/Cta'
 import Testimonials from './components/sections/Testimonials'
+import CustomCursor from './components/ui/Cursor'   // ← new
 import { useScrollReveal } from './hooks/useScrollReveal'
 
 function App() {
-  // Initialize scroll reveal observer
   useScrollReveal()
 
-  // Global navbar shadow on scroll
   useEffect(() => {
     const handleScroll = () => {
       const nav = document.querySelector('nav')
       if (nav) {
-        nav.style.boxShadow = window.scrollY > 40 
-          ? '0 4px 20px rgba(0,0,0,0.1)' 
+        nav.style.boxShadow = window.scrollY > 40
+          ? '0 4px 20px rgba(0,0,0,0.1)'
           : 'none'
       }
     }
@@ -32,6 +31,8 @@ function App() {
 
   return (
     <div className="relative">
+      {/* Cursor must be outside any overflow:hidden container */}
+      <CustomCursor />
       <Navbar />
       <Hero />
       <Marquee />
@@ -39,7 +40,7 @@ function App() {
       <Solutions />
       <About />
       <LeadCapture />
-      <Testimonials />
+      {/*<Testimonials />*/}
       <Cta />
       <Footer />
       <FloatingWhatsApp />
