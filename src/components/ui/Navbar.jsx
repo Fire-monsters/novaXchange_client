@@ -24,12 +24,18 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        scrolled ? 'glass shadow-md' : 'bg-transparent'
+      className={`fixed top-4 left-4 right-4 md:top-0 md:left-0 md:right-0 max-w-7xl md:max-w-none mx-auto z-50 
+        overflow-hidden rounded-3xl md:rounded-none border border-white/60 md:border-x-0 md:border-t-0 bg-white/55 
+        backdrop-blur-2xl backdrop-saturate-150 transition-all duration-300 
+        before:pointer-events-none before:absolute before:inset-0 before:rounded-3xl md:before:rounded-none 
+        before:bg-gradient-to-b before:from-white/65 before:via-white/20 
+        before:to-white/5 before:content-[''] ${
+        scrolled ? 'shadow-[0_18px_45px_rgba(18,13,30,0.18)]' : 'shadow-[0_10px_30px_rgba(18,13,30,0.12)]'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
+
           {/* Logo Area */}
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-yellow to-violet rounded-full shadow-md flex items-center justify-center">
@@ -76,7 +82,7 @@ const Navbar = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden glass border-t border-white/20 overflow-hidden"
+            className="md:hidden border-t border-white/35 bg-white/45 backdrop-blur-2xl overflow-hidden"
           >
             <div className="px-4 pt-2 pb-4 space-y-3">
               {navLinks.map((link) => (

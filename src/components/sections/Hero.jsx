@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { FiArrowRight, FiShoppingBag } from 'react-icons/fi'
 
-// ─── Cycling words for the typewriter span ───────────────────────────────────
+// ─── Cycling words for the typewriter span
 const cyclingWords = [
   'Instant Upgrade',
   'Real Value',
@@ -11,7 +11,7 @@ const cyclingWords = [
   'Your Next Level',
 ]
 
-// ─── Particle component (ported from File A) ─────────────────────────────────
+// ─── Particle component 
 function Particles() {
   const containerRef = useRef(null)
 

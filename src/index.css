@@ -31,7 +31,8 @@
   .reveal {
     opacity: 0;
     transform: translateY(30px);
-    transition: opacity 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1), transform 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    transition: opacity 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1), 
+    transform 0.8s cubic-bezier(0.2, 0.9, 0.4, 1.1);
   }
   .reveal.visible {
     opacity: 1;
@@ -41,10 +42,16 @@
     @apply backdrop-blur-md bg-white/80 border border-white/20;
   }
   .btn-primary {
-    @apply bg-violet text-yellow font-bold py-3 px-6 rounded-full border-2 border-ink shadow-[4px_4px_0_#120D1E] transition-all duration-200 hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_#120D1E] inline-flex items-center gap-2;
+    @apply bg-violet text-yellow font-bold py-3 px-6 
+    rounded-full border-2 border-ink shadow-[4px_4px_0_#120D1E] 
+    transition-all duration-200 hover:translate-x-[-2px] hover:translate-y-[-2px] 
+    hover:shadow-[6px_6px_0_#120D1E] inline-flex items-center gap-2;
   }
   .btn-secondary {
-    @apply bg-white text-ink font-semibold py-3 px-6 rounded-full border-2 border-ink shadow-[4px_4px_0_#120D1E] transition-all duration-200 hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_#6C2BD9] hover:border-violet hover:text-violet inline-flex items-center gap-2;
+    @apply bg-white text-ink font-semibold py-3 px-6 rounded-full 
+    border-2 border-ink shadow-[4px_4px_0_#120D1E] transition-all duration-200 
+    hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0_#6C2BD9] 
+    hover:border-violet hover:text-violet inline-flex items-center gap-2;
   }
 }
 

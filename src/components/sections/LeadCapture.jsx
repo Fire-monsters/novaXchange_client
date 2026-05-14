@@ -36,6 +36,8 @@ const LeadCapture = () => {
   }
 
   const googleFormUrl = 'https://forms.gle/VaGtSqmD4bEi1gSo7'
+  const phoneNumber = '256779543595'
+  const message = 'Hello novaXchange! I need help with a trade-in.'
 
   return (
     <section id="lead-capture" className="py-20 bg-white">
@@ -62,7 +64,7 @@ const LeadCapture = () => {
                 <FaGoogle /> Fill Google Form
               </a>
               <a
-                href="https://wa.me/256700000000?text=Hello%20novaXchange%2C%20I%20need%20help%20with%20trade-in%20estimate"
+                href={`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-green-50 text-green-700 border border-green-200 rounded-full px-5 py-2 flex items-center gap-2 font-semibold hover:bg-green-100 transition"

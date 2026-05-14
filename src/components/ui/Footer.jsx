@@ -14,7 +14,6 @@ const footerLinks = [
   { name: 'Services', href: '#solutions' },
   { name: 'Trade-In', href: '#lead-capture' },
   { name: 'Privacy Policy', href: '#' },
-  { name: 'Contact', href: '#footer' },
 ]
 
 const Footer = () => {
@@ -65,10 +64,11 @@ const Footer = () => {
             <h4 className="font-bold mb-3">Contact</h4>
             <div className="space-y-2 text-gray-400 text-sm">
               <p className="flex items-center gap-2">
-                <HiMail className="text-yellow" /> hello@novaxchange.ug
+                <HiMail className="text-yellow" /> novaxchange.xyz@gmail.com
               </p>
               <p>📍 Kampala, Uganda</p>
-              <p>📞 +256 700 000 000</p>
+              <p>📞 +256 756522705</p>
+              <p>📞 +256 779543595</p>
             </div>
           </div>
 

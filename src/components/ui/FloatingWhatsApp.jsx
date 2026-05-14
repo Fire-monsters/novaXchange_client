@@ -8,7 +8,7 @@ import { motion } from 'framer-motion'
  * Future: can be dynamic via env variable.
  */
 const FloatingWhatsApp = () => {
-  const phoneNumber = '256700000000' // Replace with actual number
+  const phoneNumber = '256779543595' 
   const message = 'Hello novaXchange! I need help with a trade-in.'
 
   const openWhatsApp = () => {
@@ -19,7 +19,8 @@ const FloatingWhatsApp = () => {
   return (
     <motion.button
       onClick={openWhatsApp}
-      className="fixed bottom-6 right-6 z-50 bg-green-500 text-white p-4 rounded-full shadow-xl flex items-center justify-center hover:scale-110 transition-transform duration-200"
+      className="fixed bottom-6 right-6 z-50
+      bg-green-500 text-white p-4 rounded-full shadow-xl flex items-center justify-center hover:scale-110 transition-transform duration-200"
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}
       whileHover={{ scale: 1.1 }}

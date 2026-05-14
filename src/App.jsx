@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import Navbar from './components/ui/Navbar'
 import FloatingWhatsApp from './components/ui/FloatingWhatsApp'
 import Footer from './components/ui/Footer'
@@ -16,19 +16,6 @@ import { useScrollReveal } from './hooks/useScrollReveal'
 function App() {
   useScrollReveal()
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const nav = document.querySelector('nav')
-      if (nav) {
-        nav.style.boxShadow = window.scrollY > 40
-          ? '0 4px 20px rgba(0,0,0,0.1)'
-          : 'none'
-      }
-    }
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
   return (
     <div className="relative">
       {/* Cursor must be outside any overflow:hidden container */}
@@ -40,7 +27,7 @@ function App() {
       <Solutions />
       <About />
       <LeadCapture />
-      {/*<Testimonials />*/}
+      <Testimonials />
       <Cta />
       <Footer />
       <FloatingWhatsApp />
