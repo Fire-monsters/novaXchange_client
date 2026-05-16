@@ -1,8 +1,15 @@
 import { useEffect } from 'react'
 
 /**
- * Custom hook to observe elements with .reveal class and add .visible when they enter viewport.
- * Future: can be extended to work with IntersectionObserver root margin for SSR/performance.
+ * Bidirectional scroll reveal.
+ *
+ * Elements with the `.reveal` class animate IN when they enter the viewport
+ * and animate OUT (reset) when they leave — so scrolling back up re-triggers
+ * the entrance animation.
+ *
+ * The CSS transition is already defined in index.css:
+ *   .reveal          { opacity: 0; transform: translateY(30px); transition: … }
+ *   .reveal.visible  { opacity: 1; transform: translateY(0); }
  */
 export const useScrollReveal = () => {
   useEffect(() => {
@@ -11,11 +18,16 @@ export const useScrollReveal = () => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('visible')
-            observer.unobserve(entry.target)
+          } else {
+            // Remove 'visible' so the animation replays on re-entry
+            entry.target.classList.remove('visible')
           }
         })
       },
-      { threshold: 0.12, rootMargin: '0px 0px -50px 0px' }
+      {
+        threshold: 0.12,
+        rootMargin: '0px 0px -50px 0px',
+      }
     )
 
     const elements = document.querySelectorAll('.reveal')

@@ -20,7 +20,7 @@ function Particles() {
     if (!container) return
     for (let i = 0; i < 22; i++) {
       const p = document.createElement('div')
-      const size = Math.random() * 3 + 1
+      const size = Math.random() * 4 + 1
       const x = Math.random() * 100
       const dur = Math.random() * 15 + 10
       const delay = Math.random() * 15
@@ -47,8 +47,8 @@ function OrbitVisual() {
   const orbitCards = [
     { icon: '✦', label: 'Genuine Gear' },
     { icon: '🔒', label: 'Secure Trade-In' },
-    { icon: '🚀', label: 'Campus Delivery' },
-    { icon: '⚡', label: 'Instant Valuation' },
+    { icon: '', label: 'Campus Delivery' },
+    { icon: '', label: 'Instant Valuation' },
   ]
 
   // Each card sits at top / right / bottom / left of the orbit ring
@@ -176,7 +176,7 @@ const Hero = () => {
         .animate-cardCounter2    { animation: cardCounter2 14s linear infinite; }
         .animate-cardCounter3    { animation: cardCounter3 14s linear infinite; }
         .animate-cardCounter4    { animation: cardCounter4 14s linear infinite; }
-        
+
         /* spinning dot on outer ring */
         .orbitRingDot::before {
           content: '';
@@ -203,8 +203,8 @@ const Hero = () => {
         <div className="absolute inset-0 z-0"
           style={{
             background: `
-              radial-gradient(ellipse 80% 60% at 50% 40%, rgba(108,43,217,0.18) 0%, transparent 70%),
-              radial-gradient(ellipse 60% 50% at 20% 80%, rgba(255,60,172,0.10) 0%, transparent 60%),
+              radial-gradient(ellipse 80% 60% at 50% 40%, rgba(108,43,217,0.18) 0%, transparent 80%),
+              radial-gradient(ellipse 60% 50% at 20% 80%, rgba(255,60,172,0.10) 0%, transparent 70%),
               #0E0A1A
             `,
           }}
