@@ -32,8 +32,7 @@ const normaliseCondition = (condition) => {
 }
 
 // ── shared input style ────────────────────────────────────────────────────────
-const inputCls =
-  'w-full p-2.5 border-2 border-ink rounded-lg bg-white text-ink text-sm focus:outline-none focus:border-violet transition-colors'
+const inputCls = 'w-full p-2.5 border-2 border-ink rounded-lg bg-white text-ink text-sm focus:outline-none focus:border-violet transition-colors'
 
 const Field = ({ label, children }) => (
   <div>
@@ -77,7 +76,9 @@ const ResultModal = ({ form, estimatedValue, onClose, onReset }) => {
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-light-gray hover:bg-violet hover:text-yellow flex items-center justify-center transition-colors border-2 border-ink"
+          className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full
+          bg-light-gray hover:bg-violet hover:text-yellow flex items-center
+          justify-center transition-colors border-2 border-ink"
           aria-label="Close"
         >
           <FiX size={18} />
@@ -88,7 +89,8 @@ const ResultModal = ({ form, estimatedValue, onClose, onReset }) => {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.15, type: 'spring', stiffness: 200 }}
-            className="w-20 h-20 rounded-full bg-green-100 border-2 border-green-400 flex items-center justify-center mx-auto mb-6"
+            className="w-20 h-20 rounded-full bg-green-100 border-2
+            border-green-400 flex items-center justify-center mx-auto mb-6"
           >
             <FiCheckCircle size={36} className="text-green-500" />
           </motion.div>
@@ -288,7 +290,10 @@ const TradeForm = () => {
             <label className="block text-sm font-semibold mb-1.5 text-ink-soft">
               Upload Photos <span className="text-gray font-normal">(optional)</span>
             </label>
-            <label className="flex flex-col items-center justify-center gap-2 p-5 rounded-xl cursor-pointer border-2 border-dashed border-ink/20 bg-white hover:border-violet/40 hover:bg-violet-pale/20 transition-all">
+            <label className="
+            flex flex-col items-center justify-center gap-2 p-5
+            rounded-xl cursor-pointer border-2 border-dashed border-ink/20 bg-white
+            hover:border-violet/40 hover:bg-violet-pale/20 transition-all">
               <FiUpload size={20} className="text-gray" />
               <p className="text-ink/60 text-sm">Drop images here or click to browse</p>
               <p className="text-gray text-xs">PNG, JPG up to 10 MB each</p>

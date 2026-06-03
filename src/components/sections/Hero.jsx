@@ -245,9 +245,9 @@ const Hero = () => {
 
             <p className="max-w-lg text-white/60 text-lg font-light leading-relaxed mb-8
               mx-auto lg:mx-0">
-              novaXchange helps students and young professionals 
-              trade in old devices, upgrade affordably, access genuine accessories, 
-              and build better digital workspaces.                                                                     
+              novaXchange helps students and young professionals
+              trade in old devices, upgrade affordably, access genuine accessories,
+              and build better digital workspaces.
               No fake products. No complicated process. Just smart upgrades.
             </p>
 
