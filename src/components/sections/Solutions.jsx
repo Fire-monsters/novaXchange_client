@@ -134,7 +134,8 @@ const PackageModal = ({ pkg, onClose }) => {
 
         {/* Modal card */}
         <motion.div
-          className="relative z-10 bg-white rounded-3xl border-2 border-ink shadow-[10px_10px_0_#120D1E] w-full max-w-lg overflow-hidden"
+          className="relative z-10 bg-white rounded-3xl border-2 border-ink
+          shadow-[10px_10px_0_#120D1E] w-full max-w-lg overflow-hidden"
           initial={{ scale: 0.88, opacity: 0, y: 40 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.88, opacity: 0, y: 40 }}
@@ -148,7 +149,8 @@ const PackageModal = ({ pkg, onClose }) => {
 
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/20 hover:bg-black/35 flex items-center justify-center transition-colors text-white border border-white/20"
+              className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/20 hover:bg-black/35
+              flex items-center justify-center transition-colors text-white border border-white/20"
               aria-label="Close"
             >
               <FiX size={16} />
@@ -156,7 +158,8 @@ const PackageModal = ({ pkg, onClose }) => {
 
             <div className="relative z-10">
               <span className="text-4xl mb-3 block">{pkg.emoji}</span>
-              <div className="inline-block bg-black/20 text-white/90 text-[10px] font-bold uppercase tracking-widest rounded-full px-3 py-1 mb-2">
+              <div className="inline-block bg-black/20 text-white/90 text-[10px]
+              font-bold uppercase tracking-widest rounded-full px-3 py-1 mb-2">
                 {pkg.subtitle}
               </div>
               <h2 className="font-bricolage font-black text-3xl text-white leading-tight">
@@ -260,7 +263,8 @@ const Solutions = () => {
               <motion.button
                 key={idx}
                 onClick={() => setActiveModal(pkg.id)}
-                className="relative group bg-off-white border-2 border-ink rounded-2xl p-6 shadow-[4px_4px_0_#120D1E] hover:shadow-[8px_8px_0_#6C2BD9] transition-all duration-300 hover:-translate-y-2 overflow-hidden text-left w-full"
+                className="relative group bg-off-white border-2 border-ink rounded-2xl p-6 shadow-[4px_4px_0_#120D1E]
+                hover:shadow-[8px_8px_0_#6C2BD9] transition-all duration-300 hover:-translate-y-2 overflow-hidden text-left w-full"
                 whileHover={{ scale: 1.02 }}
               >
                 <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${pkg.gradient}`} />

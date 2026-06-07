@@ -26,7 +26,9 @@ function App() {
       <Problem />
       <Solutions />
       <About />
+      {/*accessories sec*/}
       <LeadCapture />
+      {/* Testimonials should be after the lead capture to maximize social proof before the final CTA */}
       <Testimonials />
       <Cta />
       <Footer />

@@ -65,6 +65,7 @@ const About = () => {
             </div>
             <div className="mt-8 bg-gradient-to-r from-violet to-pink p-5 rounded-2xl text-white text-center">
               <FaLightbulb className="inline-block text-yellow text-2xl mr-2" />
+
               <span className="font-semibold">Startup growth vision:</span> We're building Africa's largest student-first tech ecosystem.
             </div>
           </div>
