@@ -49,7 +49,6 @@ const HomePage = () => {
       <About />
       <AccessoriesPreview />
       <LeadCapture />
-
       <Testimonials />
       <Cta />
       <Footer />
