@@ -62,8 +62,12 @@ function App() {
   return (
     <CartProvider>
       <Routes>
-        <Route path="/"             element={<HomePage />} />
-        <Route path="/accessories"  element={<AccessoriesPage />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin" element={<AdminGuard><AdminLayout><Dashboard /></AdminLayout></AdminGuard>} />
+        <Route path="/admin/products" element={<AdminGuard><AdminLayout><ProductsTable /></AdminLayout></AdminGuard>} />
+        <Route path="/admin/products/upload" element={<AdminGuard><AdminLayout><UploadProduct /></AdminLayout></AdminGuard>} />
+        <Route path="/admin/products/edit/:id" element={<AdminGuard><AdminLayout><UploadProduct /></AdminLayout></AdminGuard>} />
+        <Route path="/admin/categories" element={<AdminGuard><AdminLayout><Categories /></AdminLayout></AdminGuard>} />
       </Routes>
     </CartProvider>
   )

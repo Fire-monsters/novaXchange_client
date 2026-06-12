@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     r2_access_key_id: str = ""
     r2_secret_access_key: str = ""
     r2_bucket_name: str = "novaxchange-products"
-    r2_public_url: str = ""
+    r2_public_url: str = "https://pub-5b965219b7644024b0894c7005c8c3e2.r2.dev"
 
     local_upload_dir: str = "./uploads/products"
     image_source: str = "r2"
