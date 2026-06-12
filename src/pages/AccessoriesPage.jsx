@@ -28,7 +28,8 @@ import {
 import { FaWhatsapp } from 'react-icons/fa'
 import Navbar from '../components/ui/Navbar'
 import Footer from '../components/ui/Footer'
-import products, { CATEGORIES, TIERS, TAG_STYLES } from '../data/accessories'
+import { CATEGORIES, TIERS, TAG_STYLES } from '../data/accessories'
+import { useProducts } from '../hooks/useProducts'
 import { useCart } from '../context/CartContext'
 
 const WA_NUMBER = '256779543595'
@@ -221,7 +222,7 @@ const ProductModal = ({ product, onClose, deliveryLocation }) => {
               <button
                 onClick={() => setActiveImg(i => (i - 1 + product.images.length) % product.images.length)}
                 className="absolute left-2 top-1/3 -translate-y-1/2 w-8 h-8 rounded-full bg-ink/50
-                           text-white flex items-center justify-center hover:bg-ink transition"
+                          text-white flex items-center justify-center hover:bg-ink transition"
                 aria-label="Previous image"
               >
                 <FiChevronLeft size={16} />
@@ -229,7 +230,7 @@ const ProductModal = ({ product, onClose, deliveryLocation }) => {
               <button
                 onClick={() => setActiveImg(i => (i + 1) % product.images.length)}
                 className="absolute right-2 top-1/3 -translate-y-1/2 w-8 h-8 rounded-full bg-ink/50
-                           text-white flex items-center justify-center hover:bg-ink transition"
+                          text-white flex items-center justify-center hover:bg-ink transition"
                 aria-label="Next image"
               >
                 <FiChevronRight size={16} />
@@ -325,8 +326,8 @@ const ProductModal = ({ product, onClose, deliveryLocation }) => {
               whileHover={{ x: -2, y: -2 }}
               whileTap={{ scale: 0.97 }}
               className="w-full flex items-center justify-center gap-2 bg-violet text-yellow
-                         font-bricolage font-bold py-4 rounded-2xl border-2 border-ink
-                         shadow-[4px_4px_0_#120D1E] hover:shadow-[6px_6px_0_#120D1E] transition-all text-base"
+                        font-bricolage font-bold py-4 rounded-2xl border-2 border-ink
+                        shadow-[4px_4px_0_#120D1E] hover:shadow-[6px_6px_0_#120D1E] transition-all text-base"
             >
               <FaWhatsapp size={18} /> Buy it now <FiArrowRight size={16} />
             </motion.button>
@@ -335,9 +336,9 @@ const ProductModal = ({ product, onClose, deliveryLocation }) => {
             <button
               onClick={handleAddToCart}
               className="w-full flex items-center justify-center gap-2 bg-white text-ink
-                         font-semibold py-3.5 rounded-2xl border-2 border-ink
-                         shadow-[4px_4px_0_#120D1E] hover:border-violet hover:text-violet
-                         hover:shadow-[4px_4px_0_#6C2BD9] transition-all"
+                        font-semibold py-3.5 rounded-2xl border-2 border-ink
+                        shadow-[4px_4px_0_#120D1E] hover:border-violet hover:text-violet
+                        hover:shadow-[4px_4px_0_#6C2BD9] transition-all"
             >
               <FiShoppingCart size={16} /> Add to cart
             </button>
@@ -349,8 +350,8 @@ const ProductModal = ({ product, onClose, deliveryLocation }) => {
                 whileHover={{ scale: 1.01 }}
                 whileTap={{ scale: 0.97 }}
                 className="w-full flex items-center justify-center gap-2 bg-yellow text-ink
-                           font-semibold py-3.5 rounded-2xl border-2 border-ink
-                           shadow-[4px_4px_0_#120D1E] hover:bg-yellow-deep transition-all text-sm"
+                          font-semibold py-3.5 rounded-2xl border-2 border-ink
+                          shadow-[4px_4px_0_#120D1E] hover:bg-yellow-deep transition-all text-sm"
               >
                 <FiRefreshCw size={15} />
                 Trade in your current laptop for this one
@@ -640,6 +641,7 @@ const CartDrawer = ({ open, onClose }) => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const AccessoriesPage = () => {
+  const { products } = useProducts()
   const [search, setSearch]           = useState('')
   const [activeTier, setActiveTier]   = useState('all')
   const [activeCategory, setCategory] = useState('all')
@@ -700,14 +702,14 @@ const AccessoriesPage = () => {
             <button
               onClick={() => setCartOpen(true)}
               className="relative flex items-center gap-2 bg-ink text-white font-semibold
-                         py-2.5 px-5 rounded-full border-2 border-ink hover:bg-violet transition-colors
-                         self-start sm:self-auto"
+                        py-2.5 px-5 rounded-full border-2 border-ink hover:bg-violet transition-colors
+                        self-start sm:self-auto"
             >
               <FiShoppingCart size={16} />
               Cart
               {totalCount > 0 && (
                 <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-yellow text-ink
-                                 text-[10px] font-black flex items-center justify-center border border-ink">
+                                text-[10px] font-black flex items-center justify-center border border-ink">
                   {totalCount}
                 </span>
               )}
@@ -722,7 +724,7 @@ const AccessoriesPage = () => {
               onChange={e => setSearch(e.target.value)}
               placeholder="Search laptops, mice, keyboards…"
               className="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-ink text-sm bg-off-white
-                         focus:outline-none focus:border-violet transition-colors"
+                        focus:outline-none focus:border-violet transition-colors"
             />
             {search && (
               <button
