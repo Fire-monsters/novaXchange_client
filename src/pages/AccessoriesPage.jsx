@@ -25,11 +25,13 @@ import {
   FiChevronLeft, FiChevronRight, FiMapPin,
   FiPackage, FiFilter, FiRefreshCw,
 } from 'react-icons/fi'
+
 import { FaWhatsapp } from 'react-icons/fa'
 import Navbar from '../components/ui/Navbar'
 import Footer from '../components/ui/Footer'
-import { CATEGORIES, TIERS, TAG_STYLES } from '../data/accessories'
+import { TIERS, TAG_STYLES } from '../data/accessories'
 import { useProducts } from '../hooks/useProducts'
+import { useCategories } from '../hooks/useCategories'
 import { useCart } from '../context/CartContext'
 
 const WA_NUMBER = '256779543595'
@@ -77,7 +79,7 @@ const DeliveryBanner = ({ location, onSetLocation }) => {
               onKeyDown={e => e.key === 'Enter' && save()}
               placeholder="e.g. Kampala, Makerere"
               className="text-sm border border-violet/30 rounded-lg px-3 py-1 bg-white text-ink
-                         focus:outline-none focus:border-violet w-full max-w-xs"
+                        focus:outline-none focus:border-violet w-full max-w-xs"
             />
             <button
               onClick={save}
@@ -388,12 +390,12 @@ const ProductCard = ({ product, onClick }) => {
       onClick={onClick}
       whileHover={{ y: -4 }}
       className="group bg-white border-2 border-ink rounded-2xl overflow-hidden cursor-pointer
-                 shadow-[4px_4px_0_#120D1E] hover:shadow-[8px_8px_0_#6C2BD9]
-                 transition-all duration-200 flex flex-col"
+                shadow-[4px_4px_0_#120D1E] hover:shadow-[8px_8px_0_#6C2BD9]
+                transition-all duration-200 flex flex-col"
     >
       {/* Image */}
       <div className="relative overflow-hidden bg-light-gray"
-           style={{ height: isLaptop ? '200px' : '160px' }}>
+          style={{ height: isLaptop ? '200px' : '160px' }}>
         <img
           src={product.images[0]}
           alt={product.name}
@@ -428,7 +430,7 @@ const ProductCard = ({ product, onClick }) => {
         {isLaptop && (
           <div className="absolute bottom-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
             <span className="bg-yellow text-ink text-[10px] font-bold px-2 py-1 rounded-full
-                             border border-ink flex items-center gap-1">
+                            border border-ink flex items-center gap-1">
               <FiRefreshCw size={9} /> Trade-in available
             </span>
           </div>
@@ -495,8 +497,8 @@ const ProductCard = ({ product, onClick }) => {
           <button
             onClick={handleCartClick}
             className="w-9 h-9 rounded-full bg-violet-pale text-violet border border-violet/20
-                       flex items-center justify-center hover:bg-violet hover:text-yellow
-                       transition-colors flex-shrink-0"
+                      flex items-center justify-center hover:bg-violet hover:text-yellow
+                      transition-colors flex-shrink-0"
             aria-label="Add to cart"
           >
             <FiShoppingCart size={15} />
@@ -541,7 +543,7 @@ const CartDrawer = ({ open, onClose }) => {
           />
           <motion.div
             className="relative z-10 w-full max-w-sm bg-white h-full flex flex-col
-                       border-l-2 border-ink shadow-[-8px_0_0_#120D1E]"
+                      border-l-2 border-ink shadow-[-8px_0_0_#120D1E]"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
@@ -556,7 +558,7 @@ const CartDrawer = ({ open, onClose }) => {
               <button
                 onClick={onClose}
                 className="w-9 h-9 rounded-full bg-light-gray flex items-center justify-center
-                           hover:bg-violet hover:text-yellow transition-colors border border-ink/10"
+                          hover:bg-violet hover:text-yellow transition-colors border border-ink/10"
               >
                 <FiX size={16} />
               </button>
@@ -573,9 +575,9 @@ const CartDrawer = ({ open, onClose }) => {
               ) : (
                 items.map(item => (
                   <div key={item.id}
-                       className="flex gap-3 bg-off-white rounded-xl p-3 border border-ink/10">
+                      className="flex gap-3 bg-off-white rounded-xl p-3 border border-ink/10">
                     <img src={item.images[0]} alt={item.name}
-                         className="w-16 h-16 object-cover rounded-lg border border-ink/10 flex-shrink-0" />
+                        className="w-16 h-16 object-cover rounded-lg border border-ink/10 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-sm text-ink line-clamp-2 leading-snug">
                         {item.name}
@@ -586,13 +588,13 @@ const CartDrawer = ({ open, onClose }) => {
                       <div className="flex items-center gap-2 mt-2">
                         <button onClick={() => decrement(item.id)}
                                 className="w-6 h-6 rounded-full bg-light-gray border border-ink/20 text-ink
-                                           flex items-center justify-center text-sm font-bold hover:bg-violet hover:text-yellow transition">
+                                          flex items-center justify-center text-sm font-bold hover:bg-violet hover:text-yellow transition">
                           −
                         </button>
                         <span className="font-bold text-sm w-4 text-center">{item.quantity}</span>
                         <button onClick={() => increment(item.id)}
                                 className="w-6 h-6 rounded-full bg-light-gray border border-ink/20 text-ink
-                                           flex items-center justify-center text-sm font-bold hover:bg-violet hover:text-yellow transition">
+                                          flex items-center justify-center text-sm font-bold hover:bg-violet hover:text-yellow transition">
                           +
                         </button>
                         <button onClick={() => removeItem(item.id)}
@@ -616,8 +618,8 @@ const CartDrawer = ({ open, onClose }) => {
                 <button
                   onClick={handleCheckout}
                   className="w-full flex items-center justify-center gap-2 bg-violet text-yellow
-                             font-bricolage font-bold py-4 rounded-2xl border-2 border-ink
-                             shadow-[4px_4px_0_#120D1E] hover:shadow-[6px_6px_0_#120D1E] transition-all"
+                            font-bricolage font-bold py-4 rounded-2xl border-2 border-ink
+                            shadow-[4px_4px_0_#120D1E] hover:shadow-[6px_6px_0_#120D1E] transition-all"
                 >
                   <FaWhatsapp size={18} /> Checkout via WhatsApp
                 </button>
@@ -639,9 +641,9 @@ const CartDrawer = ({ open, onClose }) => {
 // ─────────────────────────────────────────────────────────────────────────────
 //  Main Page
 // ─────────────────────────────────────────────────────────────────────────────
-
 const AccessoriesPage = () => {
-  const { products } = useProducts()
+  const { products, source, loading } = useProducts()
+  const CATEGORIES = useCategories()
   const [search, setSearch]           = useState('')
   const [activeTier, setActiveTier]   = useState('all')
   const [activeCategory, setCategory] = useState('all')

@@ -33,7 +33,7 @@ import { useScrollReveal } from './hooks/useScrollReveal'
 const HomePage = () => {
   useScrollReveal()
   return (
-    <div className="relative">
+    <div className="relative custom-cursor-page">
       <CustomCursor />
       <Navbar />
       <Hero />
