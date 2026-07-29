@@ -2,6 +2,8 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import { FiArrowRight, FiMessageCircle } from 'react-icons/fi'
 
+const WA_NUMBER = import.meta.env.VITE_WA_NUMBER
+
 const Cta = () => {
   return (
     <section className="relative py-24 overflow-hidden bg-gradient-to-br from-violet to-pink">
@@ -34,7 +36,7 @@ const Cta = () => {
             hover:bg-yellow-deep transition shadow-lg">
               Start Trade-In <FiArrowRight />
             </a>
-            <a href="https://wa.me/256700000000"
+            <a href="https://wa.me/${WA_NUMBER}?text=${Hello NovaXchange!!}"
               className="bg-white/20 backdrop-blur border border-white/30
               text-white font-semibold py-3 px-6 rounded-full inline-flex items-center gap-2
               hover:bg-white/30 transition">

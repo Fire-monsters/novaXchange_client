@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { FiMenu, FiX } from 'react-icons/fi'
+import { Link } from 'react-router-dom'
+import { FiMenu, FiX, FiUser } from 'react-icons/fi'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useCustomerAuth } from '../../context/CustomerAuthContext'
 
 const navLinks = [
   { name: 'About Us', href: '#about' },
@@ -13,6 +15,7 @@ const navLinks = [
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const { user } = useCustomerAuth()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -57,6 +60,12 @@ const Navbar = () => {
                 {link.name}
               </a>
             ))}
+            <Link
+              to={user ? '/account' : '/account/login'}
+              className="flex items-center gap-1.5 text-ink-soft font-medium hover:text-violet transition-colors duration-200"
+            >
+              <FiUser size={16} /> {user ? user.name.split(' ')[0] : 'Account'}
+            </Link>
             <a
               href="#lead-capture"
               className="bg-violet text-yellow font-bold px-5 py-2 rounded-full border-2 border-ink shadow-[3px_3px_0_#120D1E] hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-[4px_4px_0_#120D1E] transition-all"
@@ -95,6 +104,13 @@ const Navbar = () => {
                   {link.name}
                 </a>
               ))}
+              <Link
+                to={user ? '/account' : '/account/login'}
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-1.5 py-2 text-ink-soft font-medium hover:text-violet transition"
+              >
+                <FiUser size={16} /> {user ? user.name.split(' ')[0] : 'Account'}
+              </Link>
               <a
                 href="#lead-capture"
                 onClick={() => setIsOpen(false)}

@@ -1,25 +1,44 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { FiMail, FiLock, FiArrowRight, FiAlertCircle } from 'react-icons/fi'
-import { adminLogin, saveToken } from '../../api/catalog'
+import { FiMail, FiLock, FiArrowRight, FiAlertCircle, FiCheckCircle } from 'react-icons/fi'
+import { adminLogin, requestAdminVerification, saveToken } from '../../api/catalog'
 
 export default function AdminLogin() {
   const navigate = useNavigate()
-  const [form, setForm]     = useState({ email: '', password: '' })
-  const [error, setError]   = useState('')
+  const [form, setForm] = useState({ email: '', password: '' })
+  const [error, setError] = useState('')
+  const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    setMessage('')
     setLoading(true)
+
     try {
       const res = await adminLogin(form.email, form.password)
       saveToken(res.access_token)
       navigate('/admin')
     } catch (err) {
-      setError(err.message || 'Invalid credentials')
+      try {
+        const verifyRes = await requestAdminVerification(form.email, form.password)
+        if (verifyRes.verification_url) {
+          setMessage(
+            <span>
+              {verifyRes.message || 'A verification link has been sent to your inbox.'}{' '}
+              <a href={verifyRes.verification_url} target="_blank" rel="noreferrer" className="font-semibold underline">
+                Open verification link
+              </a>
+            </span>
+          )
+        } else {
+          setMessage(verifyRes.message || 'A verification link has been sent to your inbox.')
+        }
+      } catch (verifyErr) {
+        setError(verifyErr.message || err.message || 'Unable to sign in right now')
+      }
     } finally {
       setLoading(false)
     }
@@ -51,6 +70,13 @@ export default function AdminLogin() {
             <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 text-sm px-3 py-2.5 rounded-lg mb-4">
               <FiAlertCircle size={14} className="flex-shrink-0" />
               {error}
+            </div>
+          )}
+
+          {message && (
+            <div className="flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-sm px-3 py-2.5 rounded-lg mb-4">
+              <FiCheckCircle size={14} className="flex-shrink-0" />
+              {message}
             </div>
           )}
 

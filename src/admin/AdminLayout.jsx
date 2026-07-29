@@ -4,6 +4,7 @@
  * On mobile: sidebar is a slide-in drawer toggled by a hamburger.
  * On desktop: sidebar is always visible (240px fixed).
  */
+
 import React, { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -108,7 +109,7 @@ const Sidebar = ({ onClose }) => {
         <button
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-4 py-2.5 mx-0 rounded-none text-sm font-medium
-                     text-gray hover:text-red-600 hover:bg-red-50 transition text-left pl-6"
+          text-gray hover:text-red-600 hover:bg-red-50 transition text-left pl-6"
         >
           <FiLogOut size={16} /> Sign out
         </button>
@@ -188,7 +189,9 @@ export function AdminLayout({ children }) {
 
         {/* Page content */}
         <main className="flex-1 overflow-auto p-4 sm:p-6">
-          {children}
+          <div className="max-w-7xl mx-auto w-full">
+            {children}
+          </div>
         </main>
       </div>
     </div>

@@ -3,10 +3,18 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { FiRefreshCw, FiZap, FiShoppingBag, FiMonitor, FiX, FiArrowRight, FiCheck } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
 
+import upgradeImg from '../../assests/nova-upgrade.png'
+import boostImg from '../../assests/nova-boost.png'
+import accessoriesImg from '../../assests/nova-accesoriess.png'
+import workspaceImg from '../../assests/nova-workspace.png'
+
 // ── WhatsApp number ───────────────────────────────────────────────────────────
-const WA_NUMBER = '256779543595'
+const WA_NUMBER = import.meta.env.VITE_WA_NUMBER
 
 // ── Package data ──────────────────────────────────────────────────────────────
+// 👇 Replace image paths with your actual asset filenames, e.g.:
+//    import upgradeImg from '../assets/nova-upgrade.jpg'
+//    then set image: upgradeImg
 const packages = [
   {
     id: 'upgrade',
@@ -16,6 +24,8 @@ const packages = [
     tagline: 'Turn your old device into your next one.',
     description:
       'Trade in your old gadget, top up a small amount, and upgrade to a better device without starting from scratch.',
+    // 👇 Replace with: import upgradeImg from '../assets/your-upgrade-image.jpg'
+    image: upgradeImg,
     features: [
       'Laptop trade-ins',
       'Instant valuation',
@@ -28,7 +38,7 @@ const packages = [
     gradient: 'from-violet to-pink',
     accentColor: '#6C2BD9',
     lightBg: '#EDE6FF',
-    href: null, // opens modal → WhatsApp
+    href: null,
   },
   {
     id: 'boost',
@@ -38,6 +48,7 @@ const packages = [
     tagline: 'Make your device feel brand new again.',
     description:
       'We help clean, optimize, and improve your device performance so it works faster and better for studying, coding, design, editing, and work.',
+    image: boostImg,
     features: [
       'Device cleanup',
       'Speed optimization',
@@ -60,6 +71,7 @@ const packages = [
     tagline: 'Gear that actually lasts.',
     description:
       'Your home for trusted and genuine tech accessories that actually last and perform.',
+    image: accessoriesImg,
     features: [
       'Genuine accessories',
       'Mice & keyboards',
@@ -68,11 +80,11 @@ const packages = [
       'Workspace accessories',
     ],
     cta: 'Explore Accessories',
-    waMessage: null, // goes to page
+    waMessage: null,
     gradient: 'from-mint to-teal',
     accentColor: '#00E5C4',
     lightBg: '#E0FBF7',
-    href: '/accessories', // future page
+    href: '/accessories',
   },
   {
     id: 'workspace',
@@ -82,6 +94,7 @@ const packages = [
     tagline: 'Build the setup that builds you.',
     description:
       'We help students and creators build clean, productive, inspiring workspaces for learning, creativity, and remote work.',
+    image: workspaceImg,
     features: [
       'Workspace setup guidance',
       'Desk accessories',
@@ -98,7 +111,7 @@ const packages = [
   },
 ]
 
-// ── Modal
+// ── Modal ─────────────────────────────────────────────────────────────────────
 const PackageModal = ({ pkg, onClose }) => {
   useEffect(() => {
     document.body.style.overflow = 'hidden'
@@ -135,7 +148,7 @@ const PackageModal = ({ pkg, onClose }) => {
         {/* Modal card */}
         <motion.div
           className="relative z-10 bg-white rounded-3xl border-2 border-ink
-          shadow-[10px_10px_0_#120D1E] w-full max-w-lg overflow-hidden"
+          shadow-[10px_10px_0_#120D1E] w-full max-w-lg overflow-hidden max-h-[90vh] overflow-y-auto"
           initial={{ scale: 0.88, opacity: 0, y: 40 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.88, opacity: 0, y: 40 }}
@@ -157,7 +170,6 @@ const PackageModal = ({ pkg, onClose }) => {
             </button>
 
             <div className="relative z-10">
-              <span className="text-4xl mb-3 block">{pkg.emoji}</span>
               <div className="inline-block bg-black/20 text-white/90 text-[10px]
               font-bold uppercase tracking-widest rounded-full px-3 py-1 mb-2">
                 {pkg.subtitle}
@@ -168,6 +180,21 @@ const PackageModal = ({ pkg, onClose }) => {
               <p className="text-white/75 text-sm mt-1 font-medium">{pkg.tagline}</p>
             </div>
           </div>
+
+          {/* ── Service image — between title and description ── */}
+          {pkg.image && (
+            <div className="w-full overflow-hidden border-b-2 border-ink/10" style={{ height: '200px' }}>
+              <img
+                src={pkg.image}
+                alt={pkg.title}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  // Hide the image container gracefully if asset not found yet
+                  e.currentTarget.parentElement.style.display = 'none'
+                }}
+              />
+            </div>
+          )}
 
           {/* Body */}
           <div className="p-6">
@@ -268,7 +295,6 @@ const Solutions = () => {
                 whileHover={{ scale: 1.02 }}
               >
                 <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${pkg.gradient}`} />
-                <span className="text-3xl mb-3 block">{pkg.emoji}</span>
                 <pkg.icon className="text-4xl text-violet mb-4" />
                 <h3 className="font-bricolage font-bold text-xl mb-1">{pkg.title}</h3>
                 <p className="text-xs text-gray font-semibold uppercase tracking-wide mb-2">{pkg.subtitle}</p>

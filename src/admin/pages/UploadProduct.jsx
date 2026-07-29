@@ -226,9 +226,9 @@ export default function UploadProduct() {
     const sourceId = id || duplicateId
     if (!sourceId) return
 
-    // Fetch all products and find by id (public endpoint returns by slug;
-    // admin endpoint returns by id — use list with limit hack for now)
-    getProducts({ active: false, limit: 100 })
+    // Fetch all products (any status) and find by id (public endpoint returns
+    // by slug; admin endpoint returns by id — use list with limit hack for now)
+    getProducts({ limit: 100 })
       .then(res => {
         const product = res.items.find(p => p.id === sourceId)
         if (!product) return
@@ -412,7 +412,7 @@ export default function UploadProduct() {
     <>
       {submitStep && <ProgressOverlay step={submitStep} uploadPct={uploadPct} />}
 
-      <div className="max-w-4xl space-y-6">
+      <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center gap-3">
           <button onClick={() => navigate(-1)}

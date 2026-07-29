@@ -12,7 +12,7 @@ const storageOpts = ['128GB', '256GB', '512GB', '1TB', '2TB']
 const conditions  = ['Excellent', 'Very Good', 'Good', 'Fair', 'Poor']
 const occupations = ['Student', 'Young Professional']
 
-const phoneNumber = '256779543595'
+const WA_NUMBER = import.meta.env.VITE_WA_NUMBER
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 const normaliseBrand = (brand) => {
@@ -128,7 +128,7 @@ const ResultModal = ({ form, estimatedValue, onClose, onReset }) => {
 
           <div className="flex flex-col gap-3">
             <a
-              href={`https://wa.me/${phoneNumber}?text=${waText}`}
+              href={`https://wa.me/${WA_NUMBER}?text=${waText}`}
               target="_blank"
               rel="noreferrer"
               className="btn-primary justify-center"

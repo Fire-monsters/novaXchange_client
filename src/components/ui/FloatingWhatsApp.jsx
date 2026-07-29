@@ -8,11 +8,11 @@ import { motion } from 'framer-motion'
  * Future: can be dynamic via env variable.
  */
 const FloatingWhatsApp = () => {
-  const phoneNumber = '256779543595' 
+  const WA_NUMBER = import.meta.env.VITE_WA_NUMBER
   const message = 'Hello novaXchange! I need help with a trade-in.'
 
   const openWhatsApp = () => {
-    const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`
+    const url = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(message)}`
     window.open(url, '_blank')
   }
 

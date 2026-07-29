@@ -45,7 +45,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-6 max-w-5xl">
+    <div className="space-y-6">
       <div>
         <h1 className="font-bricolage font-black text-2xl text-ink">Dashboard</h1>
         <p className="text-gray text-sm">Catalog overview</p>

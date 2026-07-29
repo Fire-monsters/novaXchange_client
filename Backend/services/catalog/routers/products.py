@@ -17,11 +17,12 @@ Admin endpoints  (JWT required):
 """
 
 import json
+import logging
 import math
 from typing import Optional
 
-from bson import ObjectId
-from fastapi import (
+from bson import ObjectId # pyright: ignore[reportMissingImports]
+from fastapi import ( # pyright: ignore[reportMissingImports]
     APIRouter, Depends, File, Form, HTTPException,
     Query, UploadFile, status,
 )
@@ -33,9 +34,12 @@ from catalog.models import (
     ProductOut, ProductUpdate, StockPatch,
 )
 from catalog.routers.admin_auth import get_admin_user
-from catalog.storage import delete_product_images, store_product_images
+from catalog.storage import (
+    ImageStorageError, delete_from_r2, delete_product_images, store_product_images,
+)
 
 router = APIRouter(tags=["products"])
+logger = logging.getLogger("catalog.products")
 
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/gif"}
 MAX_IMAGES_PER_PRODUCT = 6
@@ -51,19 +55,21 @@ async def list_products(
     search:   str            = Query("",    description="Search name + description"),
     category: Optional[str] = Query(None,  description="Filter by category slug"),
     tier:     Optional[str] = Query(None,  description="premium | mid-range | budget"),
-    active:   bool           = Query(True,  description="False = include drafts (admin only)"),
+    active:   Optional[bool] = Query(None, description="true=active only, false=drafts only, omit=every status (admin)"),
     page:     int            = Query(1,    ge=1),
     limit:    int            = Query(20,   ge=1, le=100),
     db=Depends(get_db),
 ):
     """
     Product listing used by both the public store and the admin table.
-    Admin panel passes active=False to see drafts.
+    Public store always passes active=true explicitly. Admin passes
+    active=true/false to filter by status, or omits it entirely to see
+    every product regardless of status.
     """
     query: dict = {}
 
-    # Public store always sees only active products
-    query["active"] = active
+    if active is not None:
+        query["active"] = active
 
     if category:
         query["category"] = category
@@ -153,12 +159,20 @@ async def create_product(
     if await db.products.find_one({"slug": product_data.slug}):
         raise HTTPException(409, f"Slug '{product_data.slug}' already exists")
 
-    # Upload images to R2
+    # Upload images to R2 — the product is only written to MongoDB below if
+    # this succeeds, so a storage failure never leaves a half-created product.
     image_urls: list[str] = []
     if images:
         _validate_images(images)
         raw_files = [(await f.read(), f.filename) for f in images]
-        results   = await store_product_images(raw_files, product_data.slug)
+        try:
+            results = await store_product_images(raw_files, product_data.slug)
+        except ImageStorageError as e:
+            logger.error("Product '%s' not created — image upload failed: %s", product_data.slug, e)
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail=f"Image upload failed, product was not saved: {e}",
+            ) from e
         image_urls = [r["url"] for r in results]
 
     # Write to MongoDB
@@ -231,7 +245,14 @@ async def delete_product(
         # Extract filenames from R2 URLs and delete
         filenames = [url.rsplit("/", 1)[-1] for url in doc.get("images", [])]
         if filenames:
-            await delete_product_images(filenames)
+            try:
+                await delete_product_images(filenames)
+            except ImageStorageError as e:
+                logger.error("Hard delete of product '%s' aborted — image cleanup failed: %s", doc["slug"], e)
+                raise HTTPException(
+                    status_code=status.HTTP_502_BAD_GATEWAY,
+                    detail=f"Could not remove product images from storage: {e}",
+                ) from e
         await db.products.delete_one({"_id": doc["_id"]})
     else:
         await db.products.update_one(
@@ -272,7 +293,14 @@ async def bulk_action(
         for doc in docs:
             all_filenames += [url.rsplit("/", 1)[-1] for url in doc.get("images", [])]
         if all_filenames:
-            await delete_product_images(all_filenames)
+            try:
+                await delete_product_images(all_filenames)
+            except ImageStorageError as e:
+                logger.error("Bulk delete aborted — image cleanup failed: %s", e)
+                raise HTTPException(
+                    status_code=status.HTTP_502_BAD_GATEWAY,
+                    detail=f"Could not remove product images from storage: {e}",
+                ) from e
         result = await db.products.delete_many({"_id": {"$in": object_ids}})
         return {"deleted": result.deleted_count}
 
@@ -298,7 +326,14 @@ async def add_images(
     _validate_images(images)
     slug      = doc["slug"]
     raw_files = [(await f.read(), f.filename) for f in images]
-    results   = await store_product_images(raw_files, slug)
+    try:
+        results = await store_product_images(raw_files, slug)
+    except ImageStorageError as e:
+        logger.error("Adding images to product '%s' failed: %s", slug, e)
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"Image upload failed: {e}",
+        ) from e
     new_urls  = [r["url"] for r in results]
 
     await db.products.update_one(
@@ -331,8 +366,14 @@ async def remove_image(
     if not to_remove:
         raise HTTPException(404, f"Image '{filename}' not found on this product")
 
-    from catalog.storage import delete_from_r2
-    await delete_from_r2(filename)
+    try:
+        await delete_from_r2(filename)
+    except ImageStorageError as e:
+        logger.error("Removing image '%s' from product '%s' failed: %s", filename, doc["slug"], e)
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"Could not remove image from storage: {e}",
+        ) from e
 
     await db.products.update_one(
         {"_id": doc["_id"]},

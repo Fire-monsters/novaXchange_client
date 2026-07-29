@@ -58,6 +58,15 @@ export const adminLogin = (email, password) =>
     body: JSON.stringify({ email, password }),
   })
 
+export const requestAdminVerification = (email, password) =>
+  request('/admin/request-verification', {
+    method: 'POST',
+    body: JSON.stringify({ email, password }),
+  })
+
+export const verifyAdminEmail = (token) =>
+  request(`/admin/verify?token=${encodeURIComponent(token)}`)
+
 export const getAdminMe = () => request('/admin/me')
 
 // ── Products (public) ─────────────────────────────────────────────────────────
@@ -112,6 +121,35 @@ export const addProductImages = (id, formData, onProgress) =>
 export const removeProductImage = (id, filename) =>
   request(`/admin/products/${id}/images/${filename}`, { method: 'DELETE' })
 
+// ── Orders (admin) ────────────────────────────────────────────────────────────
+
+export const listOrdersAdmin = (params = {}) => {
+  const q = new URLSearchParams()
+  if (params.status) q.set('status', params.status)
+  if (params.search) q.set('search', params.search)
+  if (params.page)   q.set('page', params.page)
+  if (params.limit)  q.set('limit', params.limit)
+  return request(`/admin/orders?${q}`)
+}
+
+export const getOrderAdmin = (id) => request(`/admin/orders/${id}`)
+
+export const updateOrderStatus = (id, status) =>
+  request(`/admin/orders/${id}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({ status }),
+  })
+
+// ── Customers (admin) ─────────────────────────────────────────────────────────
+
+export const listCustomersAdmin = (params = {}) => {
+  const q = new URLSearchParams()
+  if (params.search) q.set('search', params.search)
+  if (params.page)   q.set('page', params.page)
+  if (params.limit)  q.set('limit', params.limit)
+  return request(`/admin/customers?${q}`)
+}
+
 // ── Categories ────────────────────────────────────────────────────────────────
 
 export const getCategories = () => request('/categories')
@@ -122,11 +160,19 @@ export const createCategory = (body) =>
 export const deleteCategory = (id) =>
   request(`/admin/categories/${id}`, { method: 'DELETE' })
 
+// ── Store settings (admin) ───────────────────────────────────────────────────
+
+export const updateBundleDeals = (payload) =>
+  request('/admin/settings/bundle-deals', {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  })
+
 // ── Dashboard stats ───────────────────────────────────────────────────────────
 
 export const getDashboardStats = async () => {
   const [allProducts, activeProducts, draftProducts] = await Promise.all([
-    getProducts({ active: false, limit: 1 }),
+    getProducts({ limit: 1 }),
     getProducts({ active: true,  limit: 1 }),
     getProducts({ active: false, limit: 100 }),
   ])
