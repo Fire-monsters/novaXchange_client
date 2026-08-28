@@ -12,8 +12,16 @@ if str(SERVICE_ROOT) not in sys.path:
 
 from catalog.config import get_settings
 from catalog.database import connect_db, close_db
-from catalog.routers import products, categories, admin_auth, customer_auth, orders, store_settings
 from catalog.storage import check_r2_config
+
+# Routers grouped by domain:
+#   AUTH          → routers.auth (admin, customer)
+#   PRODUCTS      → routers.products (products, categories, packages, store_settings)
+#   ORDERS        → routers.orders (covers both checkout — POST /orders — and order history/status)
+#   NOTIFICATIONS → notifications.emailer (not a router — called directly by routers.orders / routers.auth.customer)
+from catalog.routers.auth import admin as admin_auth, customer as customer_auth
+from catalog.routers.products import products, categories, packages, store_settings
+from catalog.routers.orders import orders
 
 logging.basicConfig(
     level=logging.INFO,
@@ -58,6 +66,7 @@ app.include_router(store_settings.router)
 app.include_router(store_settings.admin_router)
 app.include_router(products.router)
 app.include_router(categories.router)
+app.include_router(packages.router)
 
 
 @app.get("/health")

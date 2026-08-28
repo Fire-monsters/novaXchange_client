@@ -12,8 +12,6 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, useSearchParams, Link } from 'react-router-dom'
 
-import Navbar from '../components/ui/Navbar'
-import Footer from '../components/ui/Footer'
 import OrderStatusBadge from '../components/ui/OrderStatusBadge'
 import { getOrder } from '../api/orders'
 
@@ -46,9 +44,7 @@ export default function OrderStatusPage() {
   }
 
   return (
-    <div className="min-h-screen bg-off-white">
-      <Navbar />
-      <div className="max-w-lg mx-auto px-4 pt-28 pb-16">
+    <div className="max-w-lg mx-auto px-4 pt-8 pb-16">
         <h1 className="font-bricolage font-black text-2xl text-ink mb-1">Order {orderNumber}</h1>
         <p className="text-gray text-sm mb-6">Track your order status below</p>
 
@@ -99,6 +95,12 @@ export default function OrderStatusPage() {
 
               <div className="bg-white rounded-xl border-2 border-ink p-5 shadow-[3px_3px_0_#120D1E] text-sm text-ink-soft space-y-1">
                 <p><strong className="text-ink">Delivering to:</strong> {order.customer.address}</p>
+                {order.customer.landmark && (
+                  <p><strong className="text-ink">Point of reference:</strong> {order.customer.landmark}</p>
+                )}
+                {order.customer.recipient_name && (
+                  <p><strong className="text-ink">Recipient:</strong> {order.customer.recipient_name}</p>
+                )}
                 <p><strong className="text-ink">Contact:</strong> {order.customer.whatsapp}</p>
               </div>
 
@@ -108,7 +110,5 @@ export default function OrderStatusPage() {
             </div>
         )}
       </div>
-      <Footer />
-    </div>
   )
 }

@@ -4,7 +4,7 @@ from fastapi import FastAPI  # pyright: ignore[reportMissingImports]
 from fastapi.testclient import TestClient  # pyright: ignore[reportMissingImports]
 from passlib.context import CryptContext  # pyright: ignore[reportMissingModuleSource, reportMissingImports]
 
-from catalog.routers import admin_auth
+from catalog.routers.auth import admin as admin_auth
 
 
 def test_request_verification_and_login_flow(monkeypatch):
@@ -68,7 +68,7 @@ import pytest  # pyright: ignore[reportMissingImports]
 @pytest.fixture
 def admin_auth_module():
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-    module = importlib.import_module("catalog.routers.admin_auth")
+    module = importlib.import_module("catalog.routers.auth.admin")
     return module
 
 

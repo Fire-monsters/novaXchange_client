@@ -40,6 +40,9 @@ class Settings(BaseSettings):
     # Admin credentials — set these in .env before first run
     # Set ADMIN_PASSWORD for a simple startup flow, or ADMIN_PASSWORD_HASH if you already generated a bcrypt hash.
     admin_email: str = "admin@novaxchange.xyz"
+    # Same number as the frontend's VITE_WA_NUMBER — used to build wa.me
+    # click-to-chat links in emails/admin panel (no WhatsApp API is configured).
+    admin_whatsapp: str = "256779543595"
     admin_password: str = ""
     admin_password_hash: str = "$2b$12$placeholder_replace_this_with_real_hash"
     admin_accounts_file: str = "./data/admin_accounts.json"

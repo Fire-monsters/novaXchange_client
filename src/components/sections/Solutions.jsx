@@ -7,6 +7,8 @@ import upgradeImg from '../../assests/nova-upgrade.png'
 import boostImg from '../../assests/nova-boost.png'
 import accessoriesImg from '../../assests/nova-accesoriess.png'
 import workspaceImg from '../../assests/nova-workspace.png'
+import Slideshow from '../ui/Slideshow'
+import { usePackageImages } from '../../hooks/usePackageImages'
 
 // ── WhatsApp number ───────────────────────────────────────────────────────────
 const WA_NUMBER = import.meta.env.VITE_WA_NUMBER
@@ -112,7 +114,7 @@ const packages = [
 ]
 
 // ── Modal ─────────────────────────────────────────────────────────────────────
-const PackageModal = ({ pkg, onClose }) => {
+const PackageModal = ({ pkg, onClose, images }) => {
   useEffect(() => {
     document.body.style.overflow = 'hidden'
     return () => { document.body.style.overflow = '' }
@@ -181,20 +183,16 @@ const PackageModal = ({ pkg, onClose }) => {
             </div>
           </div>
 
-          {/* ── Service image — between title and description ── */}
-          {pkg.image && (
-            <div className="w-full overflow-hidden border-b-2 border-ink/10" style={{ height: '200px' }}>
-              <img
-                src={pkg.image}
-                alt={pkg.title}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  // Hide the image container gracefully if asset not found yet
-                  e.currentTarget.parentElement.style.display = 'none'
-                }}
-              />
-            </div>
-          )}
+          {/* ── Service image slideshow — between title and description ──
+               Admin-uploaded images (if any) take priority; otherwise falls
+               back to the package's static image, unchanged from before. ── */}
+          <div className="border-b-2 border-ink/10">
+            <Slideshow
+              images={images && images.length > 0 ? images : (pkg.image ? [pkg.image] : [])}
+              alt={pkg.title}
+              height={200}
+            />
+          </div>
 
           {/* Body */}
           <div className="p-6">
@@ -268,6 +266,7 @@ const PackageModal = ({ pkg, onClose }) => {
 const Solutions = () => {
   const [activeModal, setActiveModal] = useState(null)
   const activePkg = packages.find((p) => p.id === activeModal)
+  const imagesByPackage = usePackageImages()
 
   return (
     <>
@@ -314,6 +313,7 @@ const Solutions = () => {
           <PackageModal
             pkg={activePkg}
             onClose={() => setActiveModal(null)}
+            images={imagesByPackage[activePkg.id]}
           />
         )}
       </AnimatePresence>

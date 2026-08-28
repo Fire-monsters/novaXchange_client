@@ -1,24 +1,42 @@
 import React, { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { FiUser, FiMail, FiLock, FiPhone, FiArrowRight, FiAlertCircle } from 'react-icons/fi'
+import {
+  FiUser, FiMail, FiLock, FiPhone, FiArrowRight, FiAlertCircle, FiEye, FiEyeOff,
+} from 'react-icons/fi'
 
-import Navbar from '../../components/ui/Navbar'
-import Footer from '../../components/ui/Footer'
 import GoogleAuthButton from '../../components/ui/GoogleAuthButton'
 import { useCustomerAuth } from '../../context/CustomerAuthContext'
 
 export default function CustomerRegister() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { register } = useCustomerAuth()
 
-  const [form, setForm] = useState({ name: '', email: '', password: '', whatsapp: '' })
+  const next = searchParams.get('next')
+  const loginHref = next ? `/account/login?next=${encodeURIComponent(next)}` : '/account/login'
+
+  const [form, setForm] = useState({
+    name: '', email: '', password: '', confirmPassword: '', whatsapp: '',
+  })
+  const [errors, setErrors]           = useState({})
+  const [showPassword, setShowPassword]               = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword]  = useState(false)
   const [error, setError]     = useState('')
   const [loading, setLoading] = useState(false)
+
+  const validate = () => {
+    const e = {}
+    if (form.password.length < 6) e.password = 'Password must be at least 6 characters'
+    if (form.confirmPassword !== form.password) e.confirmPassword = 'Passwords do not match'
+    setErrors(e)
+    return Object.keys(e).length === 0
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
+    if (!validate()) return
     setLoading(true)
     try {
       await register({
@@ -27,7 +45,7 @@ export default function CustomerRegister() {
         password: form.password,
         whatsapp: form.whatsapp.trim() || null,
       })
-      navigate('/account')
+      navigate(next || '/account')
     } catch (err) {
       setError(err.message || 'Unable to create account')
     } finally {
@@ -36,11 +54,13 @@ export default function CustomerRegister() {
   }
 
   return (
-    <div className="min-h-screen bg-off-white">
-      <Navbar />
-      <div className="max-w-sm mx-auto px-4 pt-32 pb-20">
-        <h1 className="font-bricolage font-black text-2xl text-ink text-center mb-1">Create an account</h1>
-        <p className="text-gray text-sm text-center mb-6">Optional — guest checkout works too</p>
+    <div className="max-w-sm mx-auto px-4 pt-12 pb-20">
+        <h1 className="font-bricolage font-black text-2xl text-ink text-center mb-1">
+          {next === '/checkout' ? 'Create your account to continue' : 'Create an account'}
+        </h1>
+        <p className="text-gray text-sm text-center mb-6">
+          {next === '/checkout' ? "Just a few details so we can deliver your order" : 'Track orders and check out faster next time'}
+        </p>
 
         <div className="bg-white rounded-2xl border-2 border-ink shadow-[5px_5px_0_#120D1E] p-6">
           {error && (
@@ -99,13 +119,47 @@ export default function CustomerRegister() {
               <div className="relative">
                 <FiLock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray" />
                 <input
-                  type="password" required minLength={6}
+                  type={showPassword ? 'text' : 'password'} required minLength={6}
                   value={form.password}
                   onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-                  className="w-full pl-9 pr-3 py-2.5 border-2 border-ink/20 rounded-lg text-sm
-                             focus:outline-none focus:border-violet transition-colors"
+                  className={`w-full pl-9 pr-9 py-2.5 border-2 rounded-lg text-sm
+                             focus:outline-none focus:border-violet transition-colors
+                             ${errors.password ? 'border-red-400' : 'border-ink/20'}`}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(s => !s)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray hover:text-ink transition"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <FiEyeOff size={14} /> : <FiEye size={14} />}
+                </button>
               </div>
+              {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-ink-soft mb-1.5">Confirm password</label>
+              <div className="relative">
+                <FiLock size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray" />
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'} required minLength={6}
+                  value={form.confirmPassword}
+                  onChange={e => setForm(f => ({ ...f, confirmPassword: e.target.value }))}
+                  className={`w-full pl-9 pr-9 py-2.5 border-2 rounded-lg text-sm
+                             focus:outline-none focus:border-violet transition-colors
+                             ${errors.confirmPassword ? 'border-red-400' : 'border-ink/20'}`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(s => !s)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray hover:text-ink transition"
+                  aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showConfirmPassword ? <FiEyeOff size={14} /> : <FiEye size={14} />}
+                </button>
+              </div>
+              {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
             </div>
 
             <motion.button
@@ -127,14 +181,12 @@ export default function CustomerRegister() {
             <span className="text-xs text-gray uppercase tracking-wide">or</span>
             <div className="flex-1 h-px bg-ink/10" />
           </div>
-          <GoogleAuthButton label="Sign up with Google" />
+          <GoogleAuthButton label="Sign up with Google" next={next} />
         </div>
 
         <p className="text-center text-gray text-sm mt-5">
-          Already have an account? <Link to="/account/login" className="text-violet font-semibold hover:underline">Sign in</Link>
+          Already have an account? <Link to={loginHref} className="text-violet font-semibold hover:underline">Sign in</Link>
         </p>
       </div>
-      <Footer />
-    </div>
   )
 }

@@ -208,6 +208,13 @@ class UserCreate(BaseModel):
     def normalize_email(cls, v: str) -> str:
         return v.strip().lower()
 
+    @field_validator("password")
+    @classmethod
+    def password_min_length(cls, v: str) -> str:
+        if len(v) < 6:
+            raise ValueError("Password must be at least 6 characters")
+        return v
+
 
 class UserLogin(BaseModel):
     email:    str
@@ -276,12 +283,14 @@ class OrderItemIn(BaseModel):
 
 
 class CustomerInfo(BaseModel):
-    name:      str
-    whatsapp:  str
-    email:     str
-    address:   str
-    notes:     Optional[str] = None
-    user_id:   Optional[str] = None
+    name:           str
+    whatsapp:       str
+    email:          str
+    address:        str
+    landmark:       Optional[str] = None   # point of reference, e.g. "Near Shell Entebbe Road"
+    recipient_name: Optional[str] = None   # who receives it, if not the account holder
+    notes:          Optional[str] = None
+    user_id:        Optional[str] = None
 
 
 class OrderCreate(BaseModel):
@@ -380,3 +389,17 @@ class BundleDealsSettings(BaseModel):
     enabled:        bool = False
     countdown_secs: int = 5
     bundles:        list[BundleDeal] = []
+
+
+# ── Package images — homepage Solutions section slideshow ────────────────────
+
+PACKAGE_IDS = {"upgrade", "boost", "accessories", "workspace"}
+
+
+class PackageImagesOut(BaseModel):
+    package_id: str
+    images:     list[str]
+
+
+class PackageImageOrderPatch(BaseModel):
+    images: list[str]   # full reordered list of image URLs

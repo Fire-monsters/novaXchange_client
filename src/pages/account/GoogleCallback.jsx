@@ -14,10 +14,17 @@ import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { FiPhone, FiArrowRight, FiAlertCircle } from 'react-icons/fi'
 
-import Navbar from '../../components/ui/Navbar'
-import Footer from '../../components/ui/Footer'
 import { supabase } from '../../lib/supabaseClient'
 import { useCustomerAuth } from '../../context/CustomerAuthContext'
+
+// Where GoogleAuthButton stashed the post-login destination, since the
+// Supabase hosted redirect can't carry our own query params through the
+// round-trip. Read once and clear so it doesn't leak into a later visit.
+const takeNextDestination = () => {
+  const next = sessionStorage.getItem('nxc_auth_next')
+  sessionStorage.removeItem('nxc_auth_next')
+  return next || '/account'
+}
 
 export default function GoogleCallback() {
   const navigate = useNavigate()
@@ -42,7 +49,7 @@ export default function GoogleCallback() {
         }
         const profile = await loginWithGoogle(data.session.access_token)
         if (profile.whatsapp) {
-          navigate('/account', { replace: true })
+          navigate(takeNextDestination(), { replace: true })
         } else {
           setStatus('needsWhatsapp')
         }
@@ -62,7 +69,7 @@ export default function GoogleCallback() {
     setError('')
     try {
       await updateProfile({ whatsapp: whatsapp.trim() || null })
-      navigate('/account', { replace: true })
+      navigate(takeNextDestination(), { replace: true })
     } catch (err) {
       setError(err.message || 'Could not save WhatsApp number')
     } finally {
@@ -71,9 +78,7 @@ export default function GoogleCallback() {
   }
 
   return (
-    <div className="min-h-screen bg-off-white">
-      <Navbar />
-      <div className="max-w-sm mx-auto px-4 pt-32 pb-20">
+    <div className="max-w-sm mx-auto px-4 pt-12 pb-20">
         {status === 'working' && (
           <div className="text-center pt-10">
             <div className="w-8 h-8 border-4 border-violet border-t-transparent rounded-full animate-spin mx-auto mb-4" />
@@ -143,7 +148,7 @@ export default function GoogleCallback() {
             </div>
 
             <button
-              onClick={() => navigate('/account', { replace: true })}
+              onClick={() => navigate(takeNextDestination(), { replace: true })}
               className="w-full text-center text-gray text-sm mt-4 hover:text-ink transition"
             >
               Skip for now
@@ -151,7 +156,5 @@ export default function GoogleCallback() {
           </>
         )}
       </div>
-      <Footer />
-    </div>
   )
 }

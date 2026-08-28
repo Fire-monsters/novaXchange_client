@@ -50,8 +50,8 @@ def _get_r2_session() -> aioboto3.Session:
     )
 
 
-async def upload_to_r2(filename: str, webp_bytes: bytes) -> str:
-    key = f"products/{filename}"
+async def upload_to_r2(filename: str, webp_bytes: bytes, folder: str = "products") -> str:
+    key = f"{folder}/{filename}"
     session = _get_r2_session()
     try:
         async with session.client("s3", endpoint_url=_r2_endpoint()) as s3:
@@ -78,8 +78,8 @@ async def save_to_disk(filename: str, webp_bytes: bytes) -> None:
         await f.write(webp_bytes)
 
 
-async def delete_from_r2(filename: str) -> None:
-    key = f"products/{filename}"
+async def delete_from_r2(filename: str, folder: str = "products") -> None:
+    key = f"{folder}/{filename}"
     session = _get_r2_session()
     try:
         async with session.client("s3", endpoint_url=_r2_endpoint()) as s3:
@@ -95,19 +95,19 @@ async def delete_from_disk(filename: str) -> None:
         path.unlink()
 
 
-def get_image_url(filename: str) -> str:
+def get_image_url(filename: str, folder: str = "products") -> str:
     """Flip between R2 and local URLs via IMAGE_SOURCE env var."""
     if settings.image_source == "local":
-        return f"{settings.base_url}/uploads/products/{filename}"
-    return f"{settings.r2_public_url}/products/{filename}"
+        return f"{settings.base_url}/uploads/{folder}/{filename}"
+    return f"{settings.r2_public_url}/{folder}/{filename}"
 
 
-async def process_and_store_image(raw_bytes: bytes, product_slug: str) -> dict:
+async def process_and_store_image(raw_bytes: bytes, slug: str, folder: str = "products") -> dict:
     webp_bytes = compress_to_webp(raw_bytes)
-    filename = f"{product_slug}-{uuid.uuid4().hex[:8]}.webp"
+    filename = f"{slug}-{uuid.uuid4().hex[:8]}.webp"
 
     # PRIMARY: upload to R2
-    url = await upload_to_r2(filename, webp_bytes)
+    url = await upload_to_r2(filename, webp_bytes, folder=folder)
 
     # BACKUP: uncomment below to enable dual-write to VPS disk
     # await asyncio.gather(
@@ -129,6 +129,16 @@ async def delete_product_images(filenames: list[str]) -> None:
     await asyncio.gather(*[delete_from_r2(f) for f in filenames])
     # Uncomment for dual-write cleanup:
     # await asyncio.gather(*[delete_from_disk(f) for f in filenames])
+
+
+async def store_package_images(raw_files: list[tuple[bytes, str]], package_id: str) -> list[dict]:
+    """Same pipeline as store_product_images, stored under packages/ instead."""
+    tasks = [process_and_store_image(raw_bytes, package_id, folder="packages") for raw_bytes, _ in raw_files]
+    return await asyncio.gather(*tasks)
+
+
+async def delete_package_images(filenames: list[str]) -> None:
+    await asyncio.gather(*[delete_from_r2(f, folder="packages") for f in filenames])
 
 
 def check_r2_config() -> list[str]:

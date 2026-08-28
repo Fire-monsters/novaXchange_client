@@ -160,6 +160,22 @@ export const createCategory = (body) =>
 export const deleteCategory = (id) =>
   request(`/admin/categories/${id}`, { method: 'DELETE' })
 
+// ── Package images (homepage Solutions slideshow) ────────────────────────────
+
+export const getPackageImages = () => request('/packages/images')
+
+export const addPackageImages = (packageId, formData, onProgress) =>
+  uploadWithProgress(`${BASE}/admin/packages/${packageId}/images`, formData, onProgress, 'POST')
+
+export const deletePackageImage = (packageId, filename) =>
+  request(`/admin/packages/${packageId}/images/${filename}`, { method: 'DELETE' })
+
+export const reorderPackageImages = (packageId, images) =>
+  request(`/admin/packages/${packageId}/images/order`, {
+    method: 'PATCH',
+    body: JSON.stringify({ images }),
+  })
+
 // ── Store settings (admin) ───────────────────────────────────────────────────
 
 export const updateBundleDeals = (payload) =>

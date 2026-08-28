@@ -23,16 +23,16 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   FiSearch, FiX, FiShoppingCart, FiArrowRight,
   FiChevronLeft, FiChevronRight, FiMapPin,
-  FiPackage, FiFilter, FiRefreshCw,
+  FiPackage, FiFilter, FiRefreshCw, FiPlus, FiMinus, FiCheck,
 } from 'react-icons/fi'
 
-import Navbar from '../components/ui/Navbar'
-import Footer from '../components/ui/Footer'
 import Seo, { SITE_URL } from '../components/seo/Seo'
 import { TIERS, TAG_STYLES } from '../data/accessories'
 import { useProducts } from '../hooks/useProducts'
 import { useCategories } from '../hooks/useCategories'
 import { useCart } from '../context/CartContext'
+import { useBuyNow } from '../context/BuyNowContext'
+import Toast from '../components/ui/Toast'
 
 const WA_NUMBER = import.meta.env.VITE_WA_NUMBER
 
@@ -123,11 +123,14 @@ const DeliveryBanner = ({ location, onSetLocation }) => {
 //  Product Detail Modal
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ProductModal = ({ product, onClose, deliveryLocation }) => {
+const ProductModal = ({ product, onClose, deliveryLocation, onAddedToCart }) => {
   const [activeImg, setActiveImg] = useState(0)
+  const [quantity, setQuantity] = useState(1)
   const { addItem } = useCart()
+  const { setBuyNow } = useBuyNow()
   const navigate = useNavigate()
   const isLaptop = product.category === 'laptop'
+  const outOfStock = product.stock <= 0
   const galleryRef = useRef(null)
 
   // Lock body scroll
@@ -136,8 +139,13 @@ const ProductModal = ({ product, onClose, deliveryLocation }) => {
     return () => { document.body.style.overflow = '' }
   }, [])
 
+  const incrementQty = () => setQuantity(q => Math.min(q + 1, product.stock))
+  const decrementQty = () => setQuantity(q => Math.max(q - 1, 1))
+
   const handleBuyNow = () => {
-    addItem(product)
+    // Buy Now is a temporary, single-item purchase intent — it never
+    // touches the persistent cart (see BuyNowContext.jsx).
+    setBuyNow(product, quantity)
     navigate('/checkout')
     onClose()
   }
@@ -150,7 +158,8 @@ const ProductModal = ({ product, onClose, deliveryLocation }) => {
   }
 
   const handleAddToCart = () => {
-    addItem(product)
+    addItem(product, quantity)
+    onAddedToCart?.(product, quantity)
     onClose()
   }
 
@@ -327,11 +336,47 @@ const ProductModal = ({ product, onClose, deliveryLocation }) => {
           )}
 
           {/* Stock warning */}
-          {product.stock <= 5 && (
+          {outOfStock ? (
+            <p className="text-red-600 text-xs font-semibold mb-3 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500 inline-block" />
+              Out of stock
+            </p>
+          ) : product.stock <= 5 && (
             <p className="text-orange-600 text-xs font-semibold mb-3 flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-orange-500 inline-block" />
               Only {product.stock} left in stock
             </p>
+          )}
+
+          {/* Quantity selector */}
+          {!outOfStock && (
+            <div className="flex items-center justify-between bg-light-gray rounded-xl p-3 mb-4">
+              <span className="text-sm font-semibold text-ink-soft">Quantity</span>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={decrementQty}
+                  disabled={quantity <= 1}
+                  className="w-8 h-8 rounded-full bg-white border-2 border-ink flex items-center justify-center
+                             disabled:opacity-30 hover:bg-violet hover:text-yellow transition"
+                  aria-label="Decrease quantity"
+                >
+                  <FiMinus size={13} />
+                </button>
+                <span className="font-bricolage font-bold text-base w-5 text-center">{quantity}</span>
+                <button
+                  onClick={incrementQty}
+                  disabled={quantity >= product.stock}
+                  className="w-8 h-8 rounded-full bg-white border-2 border-ink flex items-center justify-center
+                             disabled:opacity-30 hover:bg-violet hover:text-yellow transition"
+                  aria-label="Increase quantity"
+                >
+                  <FiPlus size={13} />
+                </button>
+              </div>
+              <span className="font-bricolage font-black text-violet text-sm">
+                UGX {(product.price_ugx * quantity).toLocaleString()}
+              </span>
+            </div>
           )}
 
           {/* ── Action buttons ── */}
@@ -339,22 +384,26 @@ const ProductModal = ({ product, onClose, deliveryLocation }) => {
             {/* Buy Now → checkout */}
             <motion.button
               onClick={handleBuyNow}
-              whileHover={{ x: -2, y: -2 }}
-              whileTap={{ scale: 0.97 }}
+              disabled={outOfStock}
+              whileHover={outOfStock ? {} : { x: -2, y: -2 }}
+              whileTap={outOfStock ? {} : { scale: 0.97 }}
               className="w-full flex items-center justify-center gap-2 bg-violet text-yellow
                         font-bricolage font-bold py-4 rounded-2xl border-2 border-ink
-                        shadow-[4px_4px_0_#120D1E] hover:shadow-[6px_6px_0_#120D1E] transition-all text-base"
+                        shadow-[4px_4px_0_#120D1E] hover:shadow-[6px_6px_0_#120D1E] transition-all text-base
+                        disabled:opacity-40 disabled:hover:shadow-[4px_4px_0_#120D1E] disabled:cursor-not-allowed"
             >
-              <FiShoppingCart size={18} /> Buy it now <FiArrowRight size={16} />
+              <FiShoppingCart size={18} /> {outOfStock ? 'Out of stock' : 'Buy it now'} {!outOfStock && <FiArrowRight size={16} />}
             </motion.button>
 
             {/* Add to cart */}
             <button
               onClick={handleAddToCart}
+              disabled={outOfStock}
               className="w-full flex items-center justify-center gap-2 bg-white text-ink
                         font-semibold py-3.5 rounded-2xl border-2 border-ink
                         shadow-[4px_4px_0_#120D1E] hover:border-violet hover:text-violet
-                        hover:shadow-[4px_4px_0_#6C2BD9] transition-all"
+                        hover:shadow-[4px_4px_0_#6C2BD9] transition-all
+                        disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-ink disabled:hover:text-ink"
             >
               <FiShoppingCart size={16} /> Add to cart
             </button>
@@ -392,11 +441,13 @@ const ProductModal = ({ product, onClose, deliveryLocation }) => {
 
 const ProductCard = ({ product, onClick }) => {
   const isLaptop = product.category === 'laptop'
-  const { addItem } = useCart()
 
+  // Quick-add opens the same product modal (image, price, stock, quantity
+  // stepper) rather than adding instantly — every add-to-cart path should
+  // go through one confirmation step before anything lands in the cart.
   const handleCartClick = (e) => {
     e.stopPropagation()
-    addItem(product)
+    onClick()
   }
 
   return (
@@ -529,10 +580,15 @@ const ProductCard = ({ product, onClick }) => {
 
 const CartDrawer = ({ open, onClose }) => {
   const { items, increment, decrement, removeItem, totalUGX, clearCart } = useCart()
+  const { clearBuyNow } = useBuyNow()
   const navigate = useNavigate()
 
   const handleCheckout = () => {
     if (items.length === 0) return
+    // Starting checkout from the cart is an explicit "check out my cart"
+    // action — drop any stale Buy Now item so it can't silently take over
+    // the checkout page instead of the cart contents.
+    clearBuyNow()
     navigate('/checkout')
     onClose()
   }
@@ -602,8 +658,10 @@ const CartDrawer = ({ open, onClose }) => {
                         </button>
                         <span className="font-bold text-sm w-4 text-center">{item.quantity}</span>
                         <button onClick={() => increment(item.id)}
+                                disabled={item.quantity >= item.stock}
                                 className="w-6 h-6 rounded-full bg-light-gray border border-ink/20 text-ink
-                                          flex items-center justify-center text-sm font-bold hover:bg-violet hover:text-yellow transition">
+                                          flex items-center justify-center text-sm font-bold hover:bg-violet hover:text-yellow transition
+                                          disabled:opacity-30 disabled:hover:bg-light-gray disabled:hover:text-ink">
                           +
                         </button>
                         <button onClick={() => removeItem(item.id)}
@@ -663,7 +721,10 @@ const AccessoriesPage = () => {
   const [deliveryLoc, setDeliveryLoc] = useState(() =>
     localStorage.getItem('nxc_delivery_loc') || ''
   )
+  const [addedToast, setAddedToast] = useState(null) // { product, quantity } | null
   const { totalCount } = useCart()
+
+  const handleAddedToCart = (product, quantity) => setAddedToast({ product, quantity })
 
   // Persist delivery location
   useEffect(() => {
@@ -719,7 +780,6 @@ const AccessoriesPage = () => {
         type={selectedProduct ? 'product' : 'website'}
         jsonLd={selectedProduct ? productJsonLd(selectedProduct) : undefined}
       />
-      <Navbar />
 
       <DeliveryBanner location={deliveryLoc} onSetLocation={setDeliveryLoc} />
 
@@ -898,8 +958,6 @@ const AccessoriesPage = () => {
         )}
       </div>
 
-      <Footer />
-
       {/* Product detail modal */}
       <AnimatePresence>
         {selectedProduct && (
@@ -907,12 +965,41 @@ const AccessoriesPage = () => {
             product={selectedProduct}
             onClose={closeProduct}
             deliveryLocation={deliveryLoc}
+            onAddedToCart={handleAddedToCart}
           />
         )}
       </AnimatePresence>
 
       {/* Cart drawer */}
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+
+      {/* Added-to-cart toast */}
+      <Toast open={!!addedToast} onClose={() => setAddedToast(null)}>
+        {addedToast && (
+          <div>
+            <p className="font-bricolage font-bold text-sm text-ink flex items-center gap-1.5 mb-1">
+              <FiCheck size={14} className="text-green-500" /> Added to cart
+            </p>
+            <p className="text-ink-soft text-xs mb-3 line-clamp-1">
+              {addedToast.product.name} · Qty {addedToast.quantity}
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => { setCartOpen(true); setAddedToast(null) }}
+                className="flex-1 bg-violet text-yellow font-bold text-xs py-2 rounded-lg border-2 border-ink"
+              >
+                View cart
+              </button>
+              <button
+                onClick={() => setAddedToast(null)}
+                className="flex-1 bg-white text-ink font-semibold text-xs py-2 rounded-lg border-2 border-ink"
+              >
+                Continue shopping
+              </button>
+            </div>
+          </div>
+        )}
+      </Toast>
     </div>
   )
 }

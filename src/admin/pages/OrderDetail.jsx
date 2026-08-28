@@ -7,9 +7,17 @@
  */
 import React, { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { FiArrowLeft } from 'react-icons/fi'
+import { FiArrowLeft, FiMessageCircle } from 'react-icons/fi'
 import { getOrderAdmin, updateOrderStatus } from '../../api/catalog'
 import OrderStatusBadge from '../../components/ui/OrderStatusBadge'
+
+// No WhatsApp API is configured — this opens a pre-filled wa.me chat that
+// the admin sends themselves, same normalization Backend/.../whatsapp.py uses.
+function waLink(raw, text) {
+  const digits = (raw || '').replace(/\D/g, '')
+  const number = digits.startsWith('256') ? digits : digits.startsWith('0') ? `256${digits.slice(1)}` : digits
+  return `https://wa.me/${number}?text=${encodeURIComponent(text)}`
+}
 
 const ALLOWED_TRANSITIONS = {
   pending:   ['confirmed', 'cancelled'],
@@ -119,9 +127,24 @@ export default function OrderDetail() {
           Customer & delivery
         </h2>
         <p><strong className="text-ink">Name:</strong> <span className="text-ink-soft">{order.customer.name}</span></p>
-        <p><strong className="text-ink">WhatsApp:</strong> <span className="text-ink-soft">{order.customer.whatsapp}</span></p>
+        <p className="flex items-center gap-2 flex-wrap">
+          <strong className="text-ink">WhatsApp:</strong> <span className="text-ink-soft">{order.customer.whatsapp}</span>
+          <a
+            href={waLink(order.customer.whatsapp, `Hi ${order.customer.name}, this is novaXchange regarding your order ${order.order_number}.`)}
+            target="_blank" rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-green-700 hover:underline"
+          >
+            <FiMessageCircle size={12} /> Message on WhatsApp
+          </a>
+        </p>
         <p><strong className="text-ink">Email:</strong> <span className="text-ink-soft">{order.customer.email}</span></p>
         <p><strong className="text-ink">Address:</strong> <span className="text-ink-soft">{order.customer.address}</span></p>
+        {order.customer.landmark && (
+          <p><strong className="text-ink">Point of reference:</strong> <span className="text-ink-soft">{order.customer.landmark}</span></p>
+        )}
+        {order.customer.recipient_name && (
+          <p><strong className="text-ink">Recipient:</strong> <span className="text-ink-soft">{order.customer.recipient_name}</span></p>
+        )}
         {order.customer.notes && (
           <p><strong className="text-ink">Notes:</strong> <span className="text-ink-soft">{order.customer.notes}</span></p>
         )}

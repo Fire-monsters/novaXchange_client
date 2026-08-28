@@ -9,7 +9,8 @@ from fastapi.testclient import TestClient  # pyright: ignore[reportMissingImport
 from motor.motor_asyncio import AsyncIOMotorClient  # pyright: ignore[reportMissingImports]
 
 from catalog.database import get_db
-from catalog.routers import admin_auth, customer_auth, orders
+from catalog.routers.auth import admin as admin_auth, customer as customer_auth
+from catalog.routers.orders import orders
 
 MONGO_URI = "mongodb://localhost:27017"
 

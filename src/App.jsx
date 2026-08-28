@@ -3,10 +3,12 @@ import { useLocation, Routes, Route } from 'react-router-dom'
 
 
 import { CartProvider } from './context/CartContext'
+import { BuyNowProvider } from './context/BuyNowContext'
 import { CustomerAuthProvider } from './context/CustomerAuthContext'
 import AccessoriesPage from './pages/AccessoriesPage'
 import CheckoutPage from './pages/CheckoutPage'
 import OrderStatusPage from './pages/OrderStatusPage'
+import OrderSuccessPage from './pages/OrderSuccessPage'
 import CustomerLogin from './pages/account/CustomerLogin'
 import CustomerRegister from './pages/account/CustomerRegister'
 import GoogleCallback from './pages/account/GoogleCallback'
@@ -26,11 +28,14 @@ import OrdersTable from './admin/pages/OrdersTable'
 import OrderDetail from './admin/pages/OrderDetail'
 import CustomersTable from './admin/pages/CustomersTable'
 import BundleSettings from './admin/pages/BundleSettings'
+import PackageImages from './admin/pages/PackageImages'
+
+// Layouts
+import { PublicLayout } from './layouts/PublicLayout'
+import { TransactionLayout } from './layouts/TransactionLayout'
 
 // Homepage sections
-import Navbar from './components/ui/Navbar'
 import FloatingWhatsApp from './components/ui/FloatingWhatsApp'
-import Footer from './components/ui/Footer'
 import Hero from './components/sections/Hero'
 import Marquee from './components/sections/Marquee'
 import Problem from './components/sections/Problem'
@@ -55,8 +60,6 @@ const HomePage = () => {
       <Seo />
       <BundleDealsPopup />
       {/* <CustomCursor /> */}
-      <ScrollToTopButton />
-      <Navbar />
       <Hero />
       <Marquee />
       <Problem />
@@ -66,7 +69,6 @@ const HomePage = () => {
       <LeadCapture />
       {/* <Testimonials /> */}
       <Cta />
-      <Footer />
       <FloatingWhatsApp />
     </div>
   )
@@ -85,17 +87,19 @@ function App() {
   return (
     <CustomerAuthProvider>
       <CartProvider>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/accessories" element={<AccessoriesPage />} />
-          <Route path="/accessories/:slug" element={<AccessoriesPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/orders/:orderNumber" element={<OrderStatusPage />} />
+        <BuyNowProvider>
+          <Routes>
+          <Route path="/" element={<PublicLayout><HomePage /></PublicLayout>} />
+          <Route path="/accessories" element={<PublicLayout><AccessoriesPage /></PublicLayout>} />
+          <Route path="/accessories/:slug" element={<PublicLayout><AccessoriesPage /></PublicLayout>} />
+          <Route path="/checkout" element={<CustomerGuard><TransactionLayout><CheckoutPage /></TransactionLayout></CustomerGuard>} />
+          <Route path="/orders/:orderNumber" element={<TransactionLayout><OrderStatusPage /></TransactionLayout>} />
+          <Route path="/orders/:orderNumber/success" element={<TransactionLayout><OrderSuccessPage /></TransactionLayout>} />
 
-          <Route path="/account/login" element={<CustomerLogin />} />
-          <Route path="/account/register" element={<CustomerRegister />} />
-          <Route path="/account/google-callback" element={<GoogleCallback />} />
-          <Route path="/account" element={<CustomerGuard><AccountPage /></CustomerGuard>} />
+          <Route path="/account/login" element={<TransactionLayout><CustomerLogin /></TransactionLayout>} />
+          <Route path="/account/register" element={<TransactionLayout><CustomerRegister /></TransactionLayout>} />
+          <Route path="/account/google-callback" element={<TransactionLayout><GoogleCallback /></TransactionLayout>} />
+          <Route path="/account" element={<CustomerGuard><PublicLayout><AccountPage /></PublicLayout></CustomerGuard>} />
 
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/verify" element={<AdminVerify />} />
@@ -104,12 +108,14 @@ function App() {
           <Route path="/admin/products/upload" element={<AdminGuard><AdminLayout><UploadProduct /></AdminLayout></AdminGuard>} />
           <Route path="/admin/products/edit/:id" element={<AdminGuard><AdminLayout><UploadProduct /></AdminLayout></AdminGuard>} />
           <Route path="/admin/categories" element={<AdminGuard><AdminLayout><Categories /></AdminLayout></AdminGuard>} />
+          <Route path="/admin/packages" element={<AdminGuard><AdminLayout><PackageImages /></AdminLayout></AdminGuard>} />
           <Route path="/admin/orders" element={<AdminGuard><AdminLayout><OrdersTable /></AdminLayout></AdminGuard>} />
           <Route path="/admin/orders/:id" element={<AdminGuard><AdminLayout><OrderDetail /></AdminLayout></AdminGuard>} />
           <Route path="/admin/customers" element={<AdminGuard><AdminLayout><CustomersTable /></AdminLayout></AdminGuard>} />
           <Route path="/admin/settings" element={<AdminGuard><AdminLayout><BundleSettings /></AdminLayout></AdminGuard>} />
-        </Routes>
-        <ScrollToTopButton />
+          </Routes>
+          <ScrollToTopButton />
+        </BuyNowProvider>
       </CartProvider>
     </CustomerAuthProvider>
   )

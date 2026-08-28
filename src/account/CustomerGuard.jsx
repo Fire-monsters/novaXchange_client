@@ -4,11 +4,12 @@
  * state from CustomerAuthContext and redirects to /account/login.
  */
 import React from 'react'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { useCustomerAuth } from '../context/CustomerAuthContext'
 
 export function CustomerGuard({ children }) {
   const { user, loading } = useCustomerAuth()
+  const location = useLocation()
 
   if (loading) {
     return (
@@ -17,6 +18,9 @@ export function CustomerGuard({ children }) {
       </div>
     )
   }
-  if (!user) return <Navigate to="/account/login" replace />
+  if (!user) {
+    const next = encodeURIComponent(location.pathname + location.search)
+    return <Navigate to={`/account/login?next=${next}`} replace />
+  }
   return children
 }

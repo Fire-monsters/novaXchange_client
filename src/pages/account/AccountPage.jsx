@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FiUser, FiPhone, FiMapPin, FiLogOut, FiCheck, FiPackage } from 'react-icons/fi'
 
-import Navbar from '../../components/ui/Navbar'
-import Footer from '../../components/ui/Footer'
 import OrderStatusBadge from '../../components/ui/OrderStatusBadge'
 import { useCustomerAuth } from '../../context/CustomerAuthContext'
 import { getMyOrders } from '../../api/orders'
@@ -50,7 +48,6 @@ export default function AccountPage() {
 
   return (
     <div className="min-h-screen bg-off-white">
-      <Navbar />
       <div className="max-w-2xl mx-auto px-4 sm:px-6 pt-28 pb-16 space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -158,7 +155,6 @@ export default function AccountPage() {
           )}
         </div>
       </div>
-      <Footer />
     </div>
   )
 }

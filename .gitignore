@@ -1,2 +1,19 @@
 .aider*
-.env
+*.env
+
+# Frontend
+node_modules/
+dist/
+.vite/
+
+# Backend
+Backend/services/catalog/venv/
+Backend/services/catalog/.pytest_cache/
+Backend/services/catalog/uploads/
+Backend/services/catalog/data/
+__pycache__/
+*.pyc
+
+# OS / editor
+.DS_Store
+*.log
