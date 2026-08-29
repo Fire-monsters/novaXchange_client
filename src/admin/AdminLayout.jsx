@@ -4,17 +4,53 @@
  * On mobile: sidebar is a slide-in drawer toggled by a hamburger.
  * On desktop: sidebar is always visible (240px fixed).
  */
-import React, { useState } from 'react'
+
+import React, { useState, useEffect, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   FiGrid, FiPackage, FiUploadCloud, FiTag,
   FiShoppingCart, FiUsers, FiRefreshCw,
   FiSettings, FiLogOut, FiMenu, FiX, FiBell,
-  FiPlus,
+  FiPlus, FiImage,
 } from 'react-icons/fi'
-import { clearToken } from '../api/catalog'
+import { clearToken, listOrdersAdmin } from '../api/catalog'
 import { useCart } from '../context/CartContext'
+import Toast from '../components/ui/Toast'
+
+const PENDING_POLL_MS = 30000
+
+// Polls the pending-order count so the bell reflects orders needing
+// attention, and pops a toast when that count rises while the admin is
+// already in the panel (a genuinely new order, not just the initial load).
+function usePendingOrdersBadge() {
+  const [count, setCount] = useState(0)
+  const [justArrived, setJustArrived] = useState(false)
+  const prevCount = useRef(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    const poll = () => {
+      listOrdersAdmin({ status: 'pending', limit: 1 })
+        .then(res => {
+          if (cancelled) return
+          if (prevCount.current !== null && res.total > prevCount.current) {
+            setJustArrived(true)
+          }
+          prevCount.current = res.total
+          setCount(res.total)
+        })
+        .catch(() => {})
+    }
+
+    poll()
+    const id = setInterval(poll, PENDING_POLL_MS)
+    return () => { cancelled = true; clearInterval(id) }
+  }, [])
+
+  return { count, justArrived, clearJustArrived: () => setJustArrived(false) }
+}
 
 const NAV = [
   { section: 'Overview' },
@@ -23,6 +59,7 @@ const NAV = [
   { label: 'Products',        href: '/admin/products',     icon: FiPackage },
   { label: 'Upload product',  href: '/admin/products/upload', icon: FiUploadCloud },
   { label: 'Categories',      href: '/admin/categories',   icon: FiTag },
+  { label: 'Package images',  href: '/admin/packages',     icon: FiImage },
   { section: 'Commerce' },
   { label: 'Orders',          href: '/admin/orders',       icon: FiShoppingCart },
   { label: 'Customers',       href: '/admin/customers',    icon: FiUsers },
@@ -108,7 +145,7 @@ const Sidebar = ({ onClose }) => {
         <button
           onClick={handleLogout}
           className="w-full flex items-center gap-3 px-4 py-2.5 mx-0 rounded-none text-sm font-medium
-                     text-gray hover:text-red-600 hover:bg-red-50 transition text-left pl-6"
+          text-gray hover:text-red-600 hover:bg-red-50 transition text-left pl-6"
         >
           <FiLogOut size={16} /> Sign out
         </button>
@@ -120,6 +157,7 @@ const Sidebar = ({ onClose }) => {
 export function AdminLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const navigate = useNavigate()
+  const { count: pendingCount, justArrived, clearJustArrived } = usePendingOrdersBadge()
 
   return (
     <div className="min-h-screen bg-light-gray flex" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
@@ -172,8 +210,16 @@ export function AdminLayout({ children }) {
           </div>
 
           <div className="flex items-center gap-2">
-            <button className="w-9 h-9 rounded-lg border border-ink/20 flex items-center justify-center text-ink-soft hover:bg-light-gray">
+            <button
+              onClick={() => navigate('/admin/orders')}
+              className="relative w-9 h-9 rounded-lg border border-ink/20 flex items-center justify-center text-ink-soft hover:bg-light-gray"
+            >
               <FiBell size={16} />
+              {pendingCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-violet text-yellow text-[10px] font-bold flex items-center justify-center border border-ink">
+                  {pendingCount > 99 ? '99+' : pendingCount}
+                </span>
+              )}
             </button>
             <button
               onClick={() => navigate('/admin/products/upload')}
@@ -188,9 +234,18 @@ export function AdminLayout({ children }) {
 
         {/* Page content */}
         <main className="flex-1 overflow-auto p-4 sm:p-6">
-          {children}
+          <div className="max-w-7xl mx-auto w-full">
+            {children}
+          </div>
         </main>
       </div>
+
+      <Toast open={justArrived} onClose={clearJustArrived}>
+        <p className="font-bricolage font-bold text-ink">New order received</p>
+        <p className="text-sm text-ink-soft mt-1">
+          {pendingCount} order{pendingCount === 1 ? '' : 's'} awaiting confirmation.
+        </p>
+      </Toast>
     </div>
   )
 }

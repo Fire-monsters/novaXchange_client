@@ -3,10 +3,20 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { FiRefreshCw, FiZap, FiShoppingBag, FiMonitor, FiX, FiArrowRight, FiCheck } from 'react-icons/fi'
 import { FaWhatsapp } from 'react-icons/fa'
 
+import upgradeImg from '../../assests/nova-upgrade.png'
+import boostImg from '../../assests/nova-boost.png'
+import accessoriesImg from '../../assests/nova-accesoriess.png'
+import workspaceImg from '../../assests/nova-workspace.png'
+import Slideshow from '../ui/Slideshow'
+import { usePackageImages } from '../../hooks/usePackageImages'
+
 // ── WhatsApp number ───────────────────────────────────────────────────────────
-const WA_NUMBER = '256779543595'
+const WA_NUMBER = import.meta.env.VITE_WA_NUMBER
 
 // ── Package data ──────────────────────────────────────────────────────────────
+// 👇 Replace image paths with your actual asset filenames, e.g.:
+//    import upgradeImg from '../assets/nova-upgrade.jpg'
+//    then set image: upgradeImg
 const packages = [
   {
     id: 'upgrade',
@@ -16,6 +26,8 @@ const packages = [
     tagline: 'Turn your old device into your next one.',
     description:
       'Trade in your old gadget, top up a small amount, and upgrade to a better device without starting from scratch.',
+    // 👇 Replace with: import upgradeImg from '../assets/your-upgrade-image.jpg'
+    image: upgradeImg,
     features: [
       'Laptop trade-ins',
       'Instant valuation',
@@ -28,7 +40,7 @@ const packages = [
     gradient: 'from-violet to-pink',
     accentColor: '#6C2BD9',
     lightBg: '#EDE6FF',
-    href: null, // opens modal → WhatsApp
+    href: null,
   },
   {
     id: 'boost',
@@ -38,6 +50,7 @@ const packages = [
     tagline: 'Make your device feel brand new again.',
     description:
       'We help clean, optimize, and improve your device performance so it works faster and better for studying, coding, design, editing, and work.',
+    image: boostImg,
     features: [
       'Device cleanup',
       'Speed optimization',
@@ -60,6 +73,7 @@ const packages = [
     tagline: 'Gear that actually lasts.',
     description:
       'Your home for trusted and genuine tech accessories that actually last and perform.',
+    image: accessoriesImg,
     features: [
       'Genuine accessories',
       'Mice & keyboards',
@@ -68,11 +82,11 @@ const packages = [
       'Workspace accessories',
     ],
     cta: 'Explore Accessories',
-    waMessage: null, // goes to page
+    waMessage: null,
     gradient: 'from-mint to-teal',
     accentColor: '#00E5C4',
     lightBg: '#E0FBF7',
-    href: '/accessories', // future page
+    href: '/accessories',
   },
   {
     id: 'workspace',
@@ -82,6 +96,7 @@ const packages = [
     tagline: 'Build the setup that builds you.',
     description:
       'We help students and creators build clean, productive, inspiring workspaces for learning, creativity, and remote work.',
+    image: workspaceImg,
     features: [
       'Workspace setup guidance',
       'Desk accessories',
@@ -98,8 +113,8 @@ const packages = [
   },
 ]
 
-// ── Modal
-const PackageModal = ({ pkg, onClose }) => {
+// ── Modal ─────────────────────────────────────────────────────────────────────
+const PackageModal = ({ pkg, onClose, images }) => {
   useEffect(() => {
     document.body.style.overflow = 'hidden'
     return () => { document.body.style.overflow = '' }
@@ -135,7 +150,7 @@ const PackageModal = ({ pkg, onClose }) => {
         {/* Modal card */}
         <motion.div
           className="relative z-10 bg-white rounded-3xl border-2 border-ink
-          shadow-[10px_10px_0_#120D1E] w-full max-w-lg overflow-hidden"
+          shadow-[10px_10px_0_#120D1E] w-full max-w-lg overflow-hidden max-h-[90vh] overflow-y-auto"
           initial={{ scale: 0.88, opacity: 0, y: 40 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.88, opacity: 0, y: 40 }}
@@ -157,7 +172,6 @@ const PackageModal = ({ pkg, onClose }) => {
             </button>
 
             <div className="relative z-10">
-              <span className="text-4xl mb-3 block">{pkg.emoji}</span>
               <div className="inline-block bg-black/20 text-white/90 text-[10px]
               font-bold uppercase tracking-widest rounded-full px-3 py-1 mb-2">
                 {pkg.subtitle}
@@ -167,6 +181,17 @@ const PackageModal = ({ pkg, onClose }) => {
               </h2>
               <p className="text-white/75 text-sm mt-1 font-medium">{pkg.tagline}</p>
             </div>
+          </div>
+
+          {/* ── Service image slideshow — between title and description ──
+               Admin-uploaded images (if any) take priority; otherwise falls
+               back to the package's static image, unchanged from before. ── */}
+          <div className="border-b-2 border-ink/10">
+            <Slideshow
+              images={images && images.length > 0 ? images : (pkg.image ? [pkg.image] : [])}
+              alt={pkg.title}
+              height={200}
+            />
           </div>
 
           {/* Body */}
@@ -241,6 +266,7 @@ const PackageModal = ({ pkg, onClose }) => {
 const Solutions = () => {
   const [activeModal, setActiveModal] = useState(null)
   const activePkg = packages.find((p) => p.id === activeModal)
+  const imagesByPackage = usePackageImages()
 
   return (
     <>
@@ -268,7 +294,6 @@ const Solutions = () => {
                 whileHover={{ scale: 1.02 }}
               >
                 <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${pkg.gradient}`} />
-                <span className="text-3xl mb-3 block">{pkg.emoji}</span>
                 <pkg.icon className="text-4xl text-violet mb-4" />
                 <h3 className="font-bricolage font-bold text-xl mb-1">{pkg.title}</h3>
                 <p className="text-xs text-gray font-semibold uppercase tracking-wide mb-2">{pkg.subtitle}</p>
@@ -288,6 +313,7 @@ const Solutions = () => {
           <PackageModal
             pkg={activePkg}
             onClose={() => setActiveModal(null)}
+            images={imagesByPackage[activePkg.id]}
           />
         )}
       </AnimatePresence>

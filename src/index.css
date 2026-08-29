@@ -13,7 +13,7 @@
   }
 }
 
-/* Custom cursor effect — only on pages that render <CustomCursor /> */
+/* Custom cursor effect — only on pages that render <CustomCursor />
 .custom-cursor-page,
 .custom-cursor-page *,
 .custom-cursor-page *::before,
@@ -29,6 +29,7 @@
     cursor: auto !important;
   }
 }
+*/
 
 @layer components {
   .reveal {

@@ -37,7 +37,7 @@ export default function Categories() {
   }
 
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6">
       <div>
         <h1 className="font-bricolage font-black text-2xl text-ink">Categories</h1>
         <p className="text-gray text-sm">Drive the filter pills in the store and admin product form</p>

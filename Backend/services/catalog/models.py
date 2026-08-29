@@ -13,8 +13,8 @@ Three model pairs per resource:
 
 from datetime import datetime
 from typing import Optional
-from bson import ObjectId
-from pydantic import BaseModel, Field, field_validator
+from bson import ObjectId  # type: ignore
+from pydantic import BaseModel, Field, field_validator  # type: ignore
 
 
 # ── ObjectId serialisation helper ────────────────────────────────────────────
@@ -193,3 +193,213 @@ class ProductListOut(BaseModel):
     page:    int
     limit:   int
     pages:   int
+
+
+# ── Customer accounts ──────────────────────────────────────────────────────────
+
+class UserCreate(BaseModel):
+    email:    str
+    password: str
+    name:     str
+    whatsapp: Optional[str] = None
+
+    @field_validator("email")
+    @classmethod
+    def normalize_email(cls, v: str) -> str:
+        return v.strip().lower()
+
+    @field_validator("password")
+    @classmethod
+    def password_min_length(cls, v: str) -> str:
+        if len(v) < 6:
+            raise ValueError("Password must be at least 6 characters")
+        return v
+
+
+class UserLogin(BaseModel):
+    email:    str
+    password: str
+
+
+class GoogleAuthIn(BaseModel):
+    access_token: str  # Supabase session access_token, verified server-side
+
+
+class UserUpdate(BaseModel):
+    name:              Optional[str] = None
+    whatsapp:          Optional[str] = None
+    delivery_address:  Optional[str] = None
+
+
+class UserOut(BaseModel):
+    id:                str
+    email:             str
+    name:              str
+    whatsapp:          Optional[str] = None
+    delivery_address:  Optional[str] = None
+    auth_provider:     str = "password"
+    created_at:        datetime
+    updated_at:        datetime
+
+    @classmethod
+    def from_db(cls, doc: dict) -> "UserOut":
+        """Convert raw MongoDB document to API response — never leaks password_hash."""
+        doc = dict(doc)
+        doc["id"] = str(doc.pop("_id"))
+        doc.pop("password_hash", None)
+        doc.pop("google_sub", None)
+        return cls(**doc)
+
+
+class CustomerTokenResponse(BaseModel):
+    access_token: str
+    token_type:   str = "bearer"
+    expires_in:   int
+
+
+class UserListOut(BaseModel):
+    items:  list[UserOut]
+    total:  int
+    page:   int
+    limit:  int
+    pages:  int
+
+
+# ── Orders ───────────────────────────────────────────────────────────────────
+
+ORDER_STATUSES = {"pending", "confirmed", "packed", "shipped", "delivered", "cancelled"}
+
+
+class OrderItemIn(BaseModel):
+    product_id: str
+    quantity:   int
+
+    @field_validator("quantity")
+    @classmethod
+    def positive(cls, v: int) -> int:
+        if v < 1:
+            raise ValueError("quantity must be >= 1")
+        return v
+
+
+class CustomerInfo(BaseModel):
+    name:           str
+    whatsapp:       str
+    email:          str
+    address:        str
+    landmark:       Optional[str] = None   # point of reference, e.g. "Near Shell Entebbe Road"
+    recipient_name: Optional[str] = None   # who receives it, if not the account holder
+    notes:          Optional[str] = None
+    user_id:        Optional[str] = None
+
+
+class OrderCreate(BaseModel):
+    customer: CustomerInfo
+    items:    list[OrderItemIn]
+
+    @field_validator("items")
+    @classmethod
+    def non_empty(cls, v: list) -> list:
+        if not v:
+            raise ValueError("Cart cannot be empty")
+        return v
+
+
+class OrderStatusPatch(BaseModel):
+    status: str
+
+    @field_validator("status")
+    @classmethod
+    def valid_status(cls, v: str) -> str:
+        if v not in ORDER_STATUSES:
+            raise ValueError(f"status must be one of {ORDER_STATUSES}")
+        return v
+
+
+class OrderItemOut(BaseModel):
+    product_id:    str
+    slug:          str
+    name:          str
+    price_ugx:     int
+    quantity:      int
+    subtotal_ugx:  int
+
+
+class OrderStatusEvent(BaseModel):
+    status: str
+    at:     datetime
+    by:     str
+
+
+class OrderOut(BaseModel):
+    id:              str
+    order_number:    str
+    customer:        CustomerInfo
+    items:           list[OrderItemOut]
+    total_ugx:       int
+    status:          str
+    status_history:  list[OrderStatusEvent]
+    created_at:      datetime
+    updated_at:      datetime
+
+    @classmethod
+    def from_db(cls, doc: dict) -> "OrderOut":
+        doc = dict(doc)
+        doc["id"] = str(doc.pop("_id"))
+        doc.pop("stock_decremented", None)
+        return cls(**doc)
+
+
+class OrderListOut(BaseModel):
+    items:  list[OrderOut]
+    total:  int
+    page:   int
+    limit:  int
+    pages:  int
+
+
+# ── Store settings — bundle deals popup ───────────────────────────────────────
+
+class BundleItemSpec(BaseModel):
+    name:   str
+    detail: str
+
+
+class BundleDeal(BaseModel):
+    id:                  str
+    tag:                 str
+    headline:            str
+    subline:             str
+    emoji:               str
+    accent_color:        str
+    accent_text:         str
+    bg_color:            str
+    items:               list[BundleItemSpec]
+    freebie:             str
+    original_price_ugx:  int
+    bundle_price_ugx:    int
+    wa_message:          str
+
+
+class BundleDealsSettings(BaseModel):
+    """Admin-editable config for BundleDealsPopup. If no document has been
+    saved yet, the frontend falls back to its own hardcoded defaults —
+    this model's own defaults (disabled, no bundles) only describe the
+    "nothing configured yet" API response, not what the popup shows."""
+    enabled:        bool = False
+    countdown_secs: int = 5
+    bundles:        list[BundleDeal] = []
+
+
+# ── Package images — homepage Solutions section slideshow ────────────────────
+
+PACKAGE_IDS = {"upgrade", "boost", "accessories", "workspace"}
+
+
+class PackageImagesOut(BaseModel):
+    package_id: str
+    images:     list[str]
+
+
+class PackageImageOrderPatch(BaseModel):
+    images: list[str]   # full reordered list of image URLs

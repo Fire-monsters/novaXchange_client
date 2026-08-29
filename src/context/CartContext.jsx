@@ -24,14 +24,15 @@ function cartReducer(state, action) {
 
     case 'ADD': {
       const existing = state.find(i => i.id === action.product.id)
+      const stock = action.product.stock
       if (existing) {
         return state.map(i =>
           i.id === action.product.id
-            ? { ...i, quantity: i.quantity + 1 }
+            ? { ...i, quantity: Math.min(i.quantity + action.quantity, stock) }
             : i
         )
       }
-      return [...state, { ...action.product, quantity: 1 }]
+      return [...state, { ...action.product, quantity: Math.min(action.quantity, stock) }]
     }
 
     case 'REMOVE':
@@ -39,7 +40,7 @@ function cartReducer(state, action) {
 
     case 'INCREMENT':
       return state.map(i =>
-        i.id === action.id ? { ...i, quantity: i.quantity + 1 } : i
+        i.id === action.id ? { ...i, quantity: Math.min(i.quantity + 1, i.stock) } : i
       )
 
     case 'DECREMENT':
@@ -75,7 +76,7 @@ export function CartProvider({ children }) {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(items))
   }, [items])
 
-  const addItem    = (product) => dispatch({ type: 'ADD', product })
+  const addItem    = (product, quantity = 1) => dispatch({ type: 'ADD', product, quantity })
   const removeItem = (id)      => dispatch({ type: 'REMOVE', id })
   const increment  = (id)      => dispatch({ type: 'INCREMENT', id })
   const decrement  = (id)      => dispatch({ type: 'DECREMENT', id })

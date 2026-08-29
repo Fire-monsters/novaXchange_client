@@ -3,9 +3,9 @@ import { getCategories } from '../api/catalog'
 import { CATEGORIES as MOCK_CATEGORIES } from '../data/accessories'
 
 /**
- * Fetches categories from /categories.
- * Falls back to the static mock list if the API is unreachable.
- * Always prepends an "All" pill — neither source includes it.
+ * Tries the live catalog API first.
+ * Falls back to bundled mock categories if the API is unreachable
+ * or returns none yet — mirrors useProducts.js.
  */
 export function useCategories() {
   const [categories, setCategories] = useState(MOCK_CATEGORIES)
@@ -15,12 +15,12 @@ export function useCategories() {
 
     getCategories()
       .then(res => {
-        if (cancelled || !res || res.length === 0) return
-        setCategories([{ id: 'all', label: 'All' }, ...res])
+        if (cancelled) return
+        if (Array.isArray(res) && res.length > 0) {
+          setCategories(res)
+        }
       })
-      .catch(() => {
-        // keep MOCK_CATEGORIES (already includes "All")
-      })
+      .catch(() => {})
 
     return () => { cancelled = true }
   }, [])

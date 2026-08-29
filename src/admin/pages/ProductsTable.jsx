@@ -101,8 +101,7 @@ export default function ProductsTable() {
     if (tier)      params.tier     = tier
     if (status === 'active') params.active = true
     if (status === 'draft')  params.active = false
-    // 'all' → fetch both via active=false (includes drafts) — admin sees everything
-    if (status === 'all')    params.active = false
+    // 'all' → omit the filter entirely so both active and draft products show
 
     getProducts(params)
       .then(res => {
@@ -177,7 +176,7 @@ export default function ProductsTable() {
   const filtersActive = search || category || tier || status !== 'all'
 
   return (
-    <div className="space-y-5 max-w-7xl">
+    <div className="space-y-5">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
